@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Renter_Capstone.Data;
 
-namespace Renter_Capstone.Data.Migrations
+namespace Renter_Capstone.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210504161551_recommended")]
+    partial class recommended
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,15 +50,15 @@ namespace Renter_Capstone.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "2734881f-83c5-4cd0-95a0-7e63ac62aa66",
-                            ConcurrencyStamp = "7a6a3761-5dec-4278-a722-62d46d048528",
+                            Id = "cba98e87-7026-4369-8da3-d540329dabc4",
+                            ConcurrencyStamp = "1aea7d88-99e1-4725-82b5-b2f30fb41d0f",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "c839de01-00d9-4fc4-a39b-969799ffcb2d",
-                            ConcurrencyStamp = "f73f16a9-b83d-4591-a1c3-843665bf1d87",
+                            Id = "8aebc221-84f6-4d74-b3fc-c9d3b739f625",
+                            ConcurrencyStamp = "56d61389-e5b3-4a27-8c09-64292d628b26",
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         });
@@ -178,12 +180,10 @@ namespace Renter_Capstone.Data.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(128)")
-                        .HasMaxLength(128);
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("nvarchar(128)")
-                        .HasMaxLength(128);
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -220,12 +220,10 @@ namespace Renter_Capstone.Data.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(128)")
-                        .HasMaxLength(128);
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(128)")
-                        .HasMaxLength(128);
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
@@ -252,7 +250,7 @@ namespace Renter_Capstone.Data.Migrations
 
             modelBuilder.Entity("Renter_Capstone.Models.Customer", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<int>("CustomerId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
@@ -275,13 +273,35 @@ namespace Renter_Capstone.Data.Migrations
                     b.Property<bool>("Renter")
                         .HasColumnType("bit");
 
-                    b.HasKey("UserId");
+                    b.HasKey("CustomerId");
 
                     b.HasIndex("IdentityUserId");
 
                     b.HasIndex("ListingId");
 
                     b.ToTable("Customers");
+                });
+
+            modelBuilder.Entity("Renter_Capstone.Models.InterestedParty", b =>
+                {
+                    b.Property<int>("InterestedId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ListingId")
+                        .HasColumnType("int");
+
+                    b.HasKey("InterestedId");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("ListingId");
+
+                    b.ToTable("InterestedParties");
                 });
 
             modelBuilder.Entity("Renter_Capstone.Models.Listing", b =>
@@ -372,6 +392,21 @@ namespace Renter_Capstone.Data.Migrations
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "IdentityUser")
                         .WithMany()
                         .HasForeignKey("IdentityUserId");
+
+                    b.HasOne("Renter_Capstone.Models.Listing", "Listing")
+                        .WithMany()
+                        .HasForeignKey("ListingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Renter_Capstone.Models.InterestedParty", b =>
+                {
+                    b.HasOne("Renter_Capstone.Models.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.HasOne("Renter_Capstone.Models.Listing", "Listing")
                         .WithMany()

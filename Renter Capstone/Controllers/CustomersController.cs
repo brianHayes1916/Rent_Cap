@@ -30,7 +30,7 @@ namespace Renter_Capstone.Controllers
                 return View("Create");
             }
             else if(customer.Leasing == true){
-                var interested = _context.InterestedParties.Where(inter => inter.Listing.Customer == customer).ToList();
+                var interested = _context.InterestedParties.Where(inter => inter.Listing == customer.Listing).ToList();
                 return View("LeasIndex", interested);
             }
             return View();
@@ -47,7 +47,7 @@ namespace Renter_Capstone.Controllers
             var customer = await _context.Customers
                 .Include(c => c.IdentityUser)
                 .Include(c => c.Listing)
-                .FirstOrDefaultAsync(m => m.UserId == id);
+                .FirstOrDefaultAsync(m => m.CustomerId == id);
             if (customer == null)
             {
                 return NotFound();
@@ -60,7 +60,7 @@ namespace Renter_Capstone.Controllers
         public IActionResult Create()
         {
             ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id");
-            ViewData["ListingId"] = new SelectList(_context.Listings, "ListingId", "ListingId");
+            //ViewData["ListingId"] = new SelectList(_context.Listings, "ListingId", "ListingId");
             return View();
         }
 
@@ -78,7 +78,7 @@ namespace Renter_Capstone.Controllers
                 return RedirectToAction(nameof(Index));
             }
             ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
-            ViewData["ListingId"] = new SelectList(_context.Listings, "ListingId", "ListingId", customer.ListingId);
+            //ViewData["ListingId"] = new SelectList(_context.Listings, "ListingId", "ListingId", customer.ListingId);
             return View(customer);
         }
 
@@ -107,7 +107,7 @@ namespace Renter_Capstone.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("UserId,Name,Bio,Renter,Leasing,IdentityUserId,ListingId")] Customer customer)
         {
-            if (id != customer.UserId)
+            if (id != customer.CustomerId)
             {
                 return NotFound();
             }
@@ -121,7 +121,7 @@ namespace Renter_Capstone.Controllers
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CustomerExists(customer.UserId))
+                    if (!CustomerExists(customer.CustomerId))
                     {
                         return NotFound();
                     }
@@ -148,7 +148,7 @@ namespace Renter_Capstone.Controllers
             var customer = await _context.Customers
                 .Include(c => c.IdentityUser)
                 .Include(c => c.Listing)
-                .FirstOrDefaultAsync(m => m.UserId == id);
+                .FirstOrDefaultAsync(m => m.CustomerId == id);
             if (customer == null)
             {
                 return NotFound();
@@ -170,7 +170,24 @@ namespace Renter_Capstone.Controllers
 
         private bool CustomerExists(int id)
         {
-            return _context.Customers.Any(e => e.UserId == id);
+            return _context.Customers.Any(e => e.CustomerId == id);
         }
+
+        [HttpPost, ActionName("AddListing")]
+        [ValidateAntiForgeryToken]
+        public IActionResult AddListing([Bind("ListingId,Prioirty,Images,Cost,Description,SquareFeet,AddressId")] Listing listing)
+        {
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var customer = _context.Customers.Where(cust => cust.IdentityUserId == userId).FirstOrDefault();
+            customer.ListingId = listing.ListingId;
+            if (ModelState.IsValid)
+            {
+                _context.Add(listing);
+                _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            return View();
+        }
+
     }
 }

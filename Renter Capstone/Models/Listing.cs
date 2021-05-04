@@ -21,9 +21,6 @@ namespace Renter_Capstone.Models
         public int AddressId { get; set; }
         public Address Address { get; set; }
 
-        [ForeignKey("Customer")]
-        public int CustomerId { get; set; }
-        public Customer Customer { get; set; }
 
     }
 }

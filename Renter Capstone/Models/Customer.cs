@@ -22,7 +22,7 @@ namespace Renter_Capstone.Models
         public IdentityUser IdentityUser { get; set; }
 
         [ForeignKey("Listing")]
-        public int ListingId { get; set; }
+        public int? ListingId { get; set; }
         public Listing Listing { get; set; }
     }
 }
