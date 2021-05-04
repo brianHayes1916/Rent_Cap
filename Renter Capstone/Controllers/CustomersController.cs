@@ -193,11 +193,30 @@ namespace Renter_Capstone.Controllers
             customer.ListingId = listing.ListingId;
             _context.Add(listing);
             _context.SaveChangesAsync();
-            if(listing.AddressId == null || listing.AddressId == 0)
+            if(listing.AddressId == 0)
             {
-                return View();
+                return View("AddAddress");
             }
             return View();
+        }
+
+        public IActionResult AddAddress()
+        {
+            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id");
+            //ViewData["ListingId"] = new SelectList(_context.Listings, "ListingId", "ListingId");
+            return View();
+        }
+
+        [HttpPost, ActionName("AddListing")]
+        [ValidateAntiForgeryToken]
+        public IActionResult AddAddress([Bind("AddressId,StreetAddress")] Address address)
+        {
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var customer = _context.Customers.Where(cust => cust.IdentityUserId == userId).FirstOrDefault();
+            customer.Listing.AddressId = address.AddressId;
+            _context.Add(address);
+            _context.SaveChangesAsync();
+            return View("Inddex");
         }
 
     }
