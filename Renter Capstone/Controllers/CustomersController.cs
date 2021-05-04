@@ -79,7 +79,11 @@ namespace Renter_Capstone.Controllers
             }
             ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
             //ViewData["ListingId"] = new SelectList(_context.Listings, "ListingId", "ListingId", customer.ListingId);
-            return View(customer);
+            if (customer.Leasing == true)
+            {
+                return View();
+            }
+            return View("Index");
         }
 
         // GET: Customers/Edit/5
@@ -173,6 +177,13 @@ namespace Renter_Capstone.Controllers
             return _context.Customers.Any(e => e.CustomerId == id);
         }
 
+        public IActionResult AddListing()
+        {
+            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id");
+            //ViewData["ListingId"] = new SelectList(_context.Listings, "ListingId", "ListingId");
+            return View();
+        }
+
         [HttpPost, ActionName("AddListing")]
         [ValidateAntiForgeryToken]
         public IActionResult AddListing([Bind("ListingId,Prioirty,Images,Cost,Description,SquareFeet,AddressId")] Listing listing)
@@ -180,11 +191,11 @@ namespace Renter_Capstone.Controllers
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customer = _context.Customers.Where(cust => cust.IdentityUserId == userId).FirstOrDefault();
             customer.ListingId = listing.ListingId;
-            if (ModelState.IsValid)
+            _context.Add(listing);
+            _context.SaveChangesAsync();
+            if(listing.AddressId == null || listing.AddressId == 0)
             {
-                _context.Add(listing);
-                _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return View();
             }
             return View();
         }
