@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Renter_Capstone.Models.Customer>
+﻿@model IEnumerable<Renter_Capstone.Models.Listing>
 
 @{
     ViewData["Title"] = "Index";
@@ -14,22 +14,22 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                @Html.DisplayNameFor(model => model.Prioirty)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Bio)
+                @Html.DisplayNameFor(model => model.Images)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Renter)
+                @Html.DisplayNameFor(model => model.Cost)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Leasing)
+                @Html.DisplayNameFor(model => model.Description)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.IdentityUser)
+                @Html.DisplayNameFor(model => model.SquareFeet)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Listing)
+                @Html.DisplayNameFor(model => model.Address)
             </th>
             <th></th>
         </tr>
@@ -38,27 +38,27 @@
 @foreach (var item in Model) {
         <tr>
             <td>
-                @Html.DisplayFor(modelItem => item.Name)
+                @Html.DisplayFor(modelItem => item.Prioirty)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Bio)
+                @Html.DisplayFor(modelItem => item.Images)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Renter)
+                @Html.DisplayFor(modelItem => item.Cost)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Leasing)
+                @Html.DisplayFor(modelItem => item.Description)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.IdentityUser.Id)
+                @Html.DisplayFor(modelItem => item.SquareFeet)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Listing.ListingId)
+                @Html.DisplayFor(modelItem => item.Address.AddressId)
             </td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.CustomerId">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.CustomerId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.CustomerId">Delete</a>
+                <a asp-action="Edit" asp-route-id="@item.ListingId">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.ListingId">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.ListingId">Delete</a>
             </td>
         </tr>
 }

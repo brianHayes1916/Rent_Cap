@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using Renter_Capstone.Data;
 using Renter_Capstone.Models;
 
@@ -191,6 +193,7 @@ namespace Renter_Capstone.Controllers
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customer = _context.Customers.Where(cust => cust.IdentityUserId == userId).FirstOrDefault();
             customer.ListingId = listing.ListingId;
+            listing.Prioirty = 0;
             _context.Add(listing);
             _context.SaveChangesAsync();
             if(listing.AddressId == 0)
@@ -207,7 +210,7 @@ namespace Renter_Capstone.Controllers
             return View();
         }
 
-        [HttpPost, ActionName("AddListing")]
+        [HttpPost, ActionName("AddAddress")]
         [ValidateAntiForgeryToken]
         public IActionResult AddAddress([Bind("AddressId,StreetAddress")] Address address)
         {
@@ -216,7 +219,20 @@ namespace Renter_Capstone.Controllers
             customer.Listing.AddressId = address.AddressId;
             _context.Add(address);
             _context.SaveChangesAsync();
-            return View("Inddex");
+            return View("Index");
+        }
+
+        public async Task<IActionResult> DeserializeGeo()
+        {
+            string url = $"https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyAgkrMw-WmvN4TIwIHgJZcQdsapADDtq-4";
+            HttpClient client = new HttpClient();
+            HttpResponseMessage response = await client.GetAsync(url);
+            string jsonResult = await response.Content.ReadAsStringAsync();
+            if (response.IsSuccessStatusCode)
+            {
+                Geocode geocode = JsonConvert.DeserializeObject<Geocode>(jsonResult);
+            }
+            return View();
         }
 
     }
