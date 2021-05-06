@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using Renter_Capstone.Data;
 using Renter_Capstone.Models;
 
@@ -27,6 +28,7 @@ namespace Renter_Capstone.Controllers
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customer = _context.Customers.Where(x => x.IdentityUserId == userId).FirstOrDefault();
+            await DeserializeGeo();
             if (customer == null)
             {
                 return View("Create");
@@ -224,13 +226,21 @@ namespace Renter_Capstone.Controllers
 
         public async Task<IActionResult> DeserializeGeo()
         {
-            string url = $"https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key=AIzaSyAgkrMw-WmvN4TIwIHgJZcQdsapADDtq-4";
+            string url = $"https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key={ApiKey.GOOGLE_API_KEY}";
             HttpClient client = new HttpClient();
             HttpResponseMessage response = await client.GetAsync(url);
             string jsonResult = await response.Content.ReadAsStringAsync();
             if (response.IsSuccessStatusCode)
             {
-                Geocode geocode = JsonConvert.DeserializeObject<Geocode>(jsonResult);
+                var geocode = JsonConvert.DeserializeObject<JObject>(jsonResult);
+                var results = geocode["results"][0];
+                var location = results["geometry"]["location"];
+
+                //customer.Listing.Address.Latitude = (double)location["lat"];
+                //customer.Listing.Address.Longitude = (double)location["lng"];
+                var lat = location["lat"];
+                var lng = location["lng"];
+               
             }
             return View();
         }
