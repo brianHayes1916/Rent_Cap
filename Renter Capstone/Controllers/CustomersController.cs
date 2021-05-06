@@ -28,36 +28,32 @@ namespace Renter_Capstone.Controllers
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customer = _context.Customers.Where(x => x.IdentityUserId == userId).FirstOrDefault();
-            await DeserializeGeo();
             if (customer == null)
             {
                 return View("Create");
             }
-            else if(customer.Leasing == true){
-                var interested = _context.InterestedParties.Where(inter => inter.Listing == customer.Listing).ToList();
-                return View("LeasIndex", interested);
-            }
+            //else if(customer.Leasing == true){
+            //    var interested = _context.InterestedParties.Where(inter => inter.Listing == customer.Listing).ToList();
+            //    return View("LeasIndex", interested);
+            //}
             return View();
         }
 
         // GET: Customers/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public IActionResult Details(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var customer = await _context.Customers
-                .Include(c => c.IdentityUser)
-                .Include(c => c.Listing)
-                .FirstOrDefaultAsync(m => m.CustomerId == id);
-            if (customer == null)
+            var listing =  _context.Listings.Where(m => m.ListingId == id);
+            if (listing == null)
             {
                 return NotFound();
             }
 
-            return View(customer);
+            return View(listing);
         }
 
         // GET: Customers/Create
@@ -75,6 +71,14 @@ namespace Renter_Capstone.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("UserId,Name,Bio,Renter,Leasing,IdentityUserId,ListingId")] Customer customer)
         {
+            
+            customer.IdentityUserId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (customer.Leasing == true && customer.ListingId == null)
+            {
+                _context.Add(customer);
+                _context.SaveChanges();
+                return View("AddListing");
+            }
             if (ModelState.IsValid)
             {
                 _context.Add(customer);
@@ -83,10 +87,6 @@ namespace Renter_Capstone.Controllers
             }
             ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
             //ViewData["ListingId"] = new SelectList(_context.Listings, "ListingId", "ListingId", customer.ListingId);
-            if (customer.Leasing == true)
-            {
-                return View();
-            }
             return View("Index");
         }
 
@@ -198,7 +198,7 @@ namespace Renter_Capstone.Controllers
             listing.Prioirty = 0;
             _context.Add(listing);
             _context.SaveChangesAsync();
-            if(listing.AddressId == 0)
+            if(listing.AddressId == 0 || listing.AddressId == null)
             {
                 return View("AddAddress");
             }
@@ -214,19 +214,20 @@ namespace Renter_Capstone.Controllers
 
         [HttpPost, ActionName("AddAddress")]
         [ValidateAntiForgeryToken]
-        public IActionResult AddAddress([Bind("AddressId,StreetAddress")] Address address)
+        public IActionResult AddAddress([Bind("AddressId,StreetAddress,City,State,Latitute,Longitude")] Address address)
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customer = _context.Customers.Where(cust => cust.IdentityUserId == userId).FirstOrDefault();
             customer.Listing.AddressId = address.AddressId;
+            DeserializeGeo(customer);
             _context.Add(address);
             _context.SaveChangesAsync();
             return View("Index");
         }
 
-        public async Task<IActionResult> DeserializeGeo()
+        public async void DeserializeGeo(Customer customer)
         {
-            string url = $"https://maps.googleapis.com/maps/api/geocode/json?address=1600+Amphitheatre+Parkway,+Mountain+View,+CA&key={ApiKey.GOOGLE_API_KEY}";
+            string url = $"https://maps.googleapis.com/maps/api/geocode/json?address={customer.Listing.Address.StreetAddress},{customer.Listing.Address.City},{customer.Listing.Address.State}&key={ApiKey.GOOGLE_API_KEY}";
             HttpClient client = new HttpClient();
             HttpResponseMessage response = await client.GetAsync(url);
             string jsonResult = await response.Content.ReadAsStringAsync();
@@ -236,13 +237,13 @@ namespace Renter_Capstone.Controllers
                 var results = geocode["results"][0];
                 var location = results["geometry"]["location"];
 
-                //customer.Listing.Address.Latitude = (double)location["lat"];
-                //customer.Listing.Address.Longitude = (double)location["lng"];
+                customer.Listing.Address.Latitute = (double)location["lat"];
+                customer.Listing.Address.Longitude = (double)location["lng"];
                 var lat = location["lat"];
                 var lng = location["lng"];
                
             }
-            return View();
+           
         }
 
     }
