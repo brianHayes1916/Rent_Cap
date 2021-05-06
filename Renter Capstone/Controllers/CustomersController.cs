@@ -87,7 +87,8 @@ namespace Renter_Capstone.Controllers
             }
             ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
             //ViewData["ListingId"] = new SelectList(_context.Listings, "ListingId", "ListingId", customer.ListingId);
-            return View("Index");
+            var listings = _context.Listings.ToList();
+            return View("Index", listings);
         }
 
         // GET: Customers/Edit/5
@@ -197,7 +198,7 @@ namespace Renter_Capstone.Controllers
             customer.ListingId = listing.ListingId;
             listing.Prioirty = 0;
             _context.Add(listing);
-            _context.SaveChangesAsync();
+            _context.SaveChanges();
             if(listing.AddressId == 0 || listing.AddressId == null)
             {
                 return View("AddAddress");
@@ -222,7 +223,8 @@ namespace Renter_Capstone.Controllers
             DeserializeGeo(customer);
             _context.Add(address);
             _context.SaveChangesAsync();
-            return View("Index");
+            var listings = _context.Listings.ToList();
+            return View("Index", listings);
         }
 
         public async void DeserializeGeo(Customer customer)
@@ -236,12 +238,10 @@ namespace Renter_Capstone.Controllers
                 var geocode = JsonConvert.DeserializeObject<JObject>(jsonResult);
                 var results = geocode["results"][0];
                 var location = results["geometry"]["location"];
-
                 customer.Listing.Address.Latitute = (double)location["lat"];
                 customer.Listing.Address.Longitude = (double)location["lng"];
                 var lat = location["lat"];
-                var lng = location["lng"];
-               
+                var lng = location["lng"];               
             }
            
         }
