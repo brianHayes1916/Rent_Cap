@@ -10,6 +10,13 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+<p>
+    @using (Html.BeginForm())
+    {
+        <select name="cost" asp-items="@ViewBag.Cost"></select>
+        <input type="submit" value="Search" />
+    }
+</p>
 <table class="table">
     <thead>
         <tr>
@@ -24,6 +31,12 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.SquareFeet)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.NumberOfRoomMates)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.YearPref)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Address)
@@ -45,6 +58,12 @@
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.SquareFeet)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NumberOfRoomMates)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.YearPref)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Address.AddressId)

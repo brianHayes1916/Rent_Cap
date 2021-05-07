@@ -16,6 +16,7 @@ namespace Renter_Capstone.Models
         public string Description { get; set; }
         public int SquareFeet { get; set; }
         public int NumberOfRoomMates { get; set; }
+        public int YearPref { get; set; }
 
         [ForeignKey("Address")]
         public int? AddressId { get; set; }

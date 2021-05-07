@@ -32,11 +32,12 @@ namespace Renter_Capstone.Controllers
             {
                 return View("Create");
             }
-            //else if(customer.Leasing == true){
-            //    var interested = _context.InterestedParties.Where(inter => inter.Listing == customer.Listing).ToList();
-            //    return View("LeasIndex", interested);
-            //}
-            var listings = _context.Listings.ToList();
+            else if (customer.Leasing == true)
+            {
+                var interested = _context.InterestedParties.Where(inter => inter.Listing == customer.Listing).ToList();
+                return View("LeasIndex", interested);
+            }
+            var listings = _context.Listings.Where(lis => lis.YearPref == customer.Year);
             return View(listings);
         }
 
@@ -70,7 +71,7 @@ namespace Renter_Capstone.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UserId,Name,Bio,Renter,Leasing,IdentityUserId,ListingId")] Customer customer)
+        public async Task<IActionResult> Create([Bind("UserId,Name,Bio,Renter,Leasing,Year,IdentityUserId,ListingId")] Customer customer)
         {
             
             customer.IdentityUserId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -88,7 +89,7 @@ namespace Renter_Capstone.Controllers
             }
             ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
             //ViewData["ListingId"] = new SelectList(_context.Listings, "ListingId", "ListingId", customer.ListingId);
-            var listings = _context.Listings.ToList();
+            var listings = _context.Listings.Where(lis => lis.YearPref == customer.Year);
             return View("Index", listings);
         }
 
@@ -100,14 +101,14 @@ namespace Renter_Capstone.Controllers
                 return NotFound();
             }
 
-            var customer = await _context.Customers.FindAsync(id);
-            if (customer == null)
+            var listing = await _context.Listings.FindAsync(id);
+            if (listing == null)
             {
                 return NotFound();
             }
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
-            ViewData["ListingId"] = new SelectList(_context.Listings, "ListingId", "ListingId", customer.ListingId);
-            return View(customer);
+            //ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
+            //ViewData["ListingId"] = new SelectList(_context.Listings, "ListingId", "ListingId", customer.ListingId);
+            return View(listing);
         }
 
         // POST: Customers/Edit/5
@@ -115,7 +116,7 @@ namespace Renter_Capstone.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ListingId,Prioirty,Cost,Description,SquareFeet,AddressId")] Listing listing)
+        public async Task<IActionResult> Edit(int id, [Bind("ListingId,Prioirty,Cost,Description,SquareFeet,NumberOfRoomMates,YearPref,AddressId")] Listing listing)
         {
             if (id != listing.ListingId)
             {
@@ -189,7 +190,7 @@ namespace Renter_Capstone.Controllers
 
         [HttpPost, ActionName("AddListing")]
         [ValidateAntiForgeryToken]
-        public IActionResult AddListing([Bind("ListingId,Prioirty,Cost,Description,SquareFeet,AddressId")] Listing listing)
+        public IActionResult AddListing([Bind("ListingId,Prioirty,Cost,Description,SquareFeet,NumberOfRoomMates,YearPref,AddressId")] Listing listing)
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customer = _context.Customers.Where(cust => cust.IdentityUserId == userId).FirstOrDefault();
@@ -225,7 +226,7 @@ namespace Renter_Capstone.Controllers
             Customer customerholder = new Customer();
             customerholder = await DeserializeGeo(customer);
             _context.SaveChanges();
-            var listings = _context.Listings.ToList();
+            var listings = _context.Listings.Where(lis => lis.YearPref == customer.Year);
             return View("Index", listings);
         }
 
@@ -251,13 +252,15 @@ namespace Renter_Capstone.Controllers
 
         public IActionResult FilterListings()
         {
-            var cost = _context.Listings.Select(x => x.Cost).Distinct().ToList();
+            List<int> cost = _context.Listings.Select(x => x.Cost).Distinct().ToList();
             cost.Add(0);
             ViewBag.Cost = new SelectList(cost);
             var listings = _context.Listings;
             return View(listings);
         }
 
+        [HttpPost, ActionName("Index")]
+        [ValidateAntiForgeryToken]
         public IActionResult FilterListings(int cost)
         {
             var cost1 = _context.Listings.Select(x => x.Cost).Distinct().ToList();
@@ -285,5 +288,21 @@ namespace Renter_Capstone.Controllers
             
         }
 
+
+        public IActionResult Interested(int id)
+        {
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var customer = _context.Customers.Where(cust => cust.IdentityUserId == userId).FirstOrDefault();
+            InterestedParty interested = new InterestedParty();
+            interested.Customer = customer;
+            interested.CustomerId = customer.CustomerId;
+            interested.ListingId = id;
+            Listing listed = _context.Listings.Where(lis => lis.ListingId == id).FirstOrDefault();
+            interested.Listing = listed;
+            _context.Add(interested);
+            _context.SaveChanges();
+            var listings = _context.Listings.Where(lis => lis.YearPref == customer.Year);
+            return View("Index");
+        }
     }
 }
