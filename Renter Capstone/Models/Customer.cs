@@ -16,6 +16,7 @@ namespace Renter_Capstone.Models
         public string Bio { get; set; }
         public bool Renter { get; set; }
         public bool Leasing { get; set; }
+        public int year { get; set; }
 
         [ForeignKey("IdentityUser")]
         public string IdentityUserId { get; set; }

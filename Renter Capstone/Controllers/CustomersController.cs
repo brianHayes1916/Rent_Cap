@@ -115,7 +115,7 @@ namespace Renter_Capstone.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ListingId,Prioirty,Images,Cost,Description,SquareFeet,AddressId")] Listing listing)
+        public async Task<IActionResult> Edit(int id, [Bind("ListingId,Prioirty,Cost,Description,SquareFeet,AddressId")] Listing listing)
         {
             if (id != listing.ListingId)
             {
@@ -189,7 +189,7 @@ namespace Renter_Capstone.Controllers
 
         [HttpPost, ActionName("AddListing")]
         [ValidateAntiForgeryToken]
-        public IActionResult AddListing([Bind("ListingId,Prioirty,Images,Cost,Description,SquareFeet,AddressId")] Listing listing)
+        public IActionResult AddListing([Bind("ListingId,Prioirty,Cost,Description,SquareFeet,AddressId")] Listing listing)
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customer = _context.Customers.Where(cust => cust.IdentityUserId == userId).FirstOrDefault();
