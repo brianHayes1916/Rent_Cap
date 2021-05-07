@@ -24,7 +24,7 @@ namespace Renter_Capstone.Controllers
         }
 
         // GET: Customers
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customer = _context.Customers.Where(x => x.IdentityUserId == userId).FirstOrDefault();
@@ -115,9 +115,9 @@ namespace Renter_Capstone.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("UserId,Name,Bio,Renter,Leasing,IdentityUserId,ListingId")] Customer customer)
+        public async Task<IActionResult> Edit(int id, [Bind("ListingId,Prioirty,Images,Cost,Description,SquareFeet,AddressId")] Listing listing)
         {
-            if (id != customer.CustomerId)
+            if (id != listing.ListingId)
             {
                 return NotFound();
             }
@@ -126,12 +126,12 @@ namespace Renter_Capstone.Controllers
             {
                 try
                 {
-                    _context.Update(customer);
+                    _context.Update(listing);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)
                 {
-                    if (!CustomerExists(customer.CustomerId))
+                    if (!CustomerExists(listing.ListingId))
                     {
                         return NotFound();
                     }
@@ -142,9 +142,9 @@ namespace Renter_Capstone.Controllers
                 }
                 return RedirectToAction(nameof(Index));
             }
-            ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
-            ViewData["ListingId"] = new SelectList(_context.Listings, "ListingId", "ListingId", customer.ListingId);
-            return View(customer);
+            //ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
+            //ViewData["ListingId"] = new SelectList(_context.Listings, "ListingId", "ListingId", customer.ListingId);
+            return View(listing);
         }
 
         // GET: Customers/Delete/5
@@ -169,8 +169,8 @@ namespace Renter_Capstone.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var customer = await _context.Customers.FindAsync(id);
-            _context.Customers.Remove(customer);
+            var listing = await _context.Listings.FindAsync(id);
+            _context.Listings.Remove(listing);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
@@ -214,7 +214,7 @@ namespace Renter_Capstone.Controllers
 
         [HttpPost, ActionName("AddAddress")]
         [ValidateAntiForgeryToken]
-        public IActionResult AddAddress([Bind("AddressId,StreetAddress,City,State,Latitute,Longitude")] Address address)
+        public async Task<IActionResult> AddAddress([Bind("AddressId,StreetAddress,City,State,Latitute,Longitude")] Address address)
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);                      
             _context.Add(address);
@@ -222,27 +222,31 @@ namespace Renter_Capstone.Controllers
             var customer = _context.Customers.Where(cust => cust.IdentityUserId == userId).Include(c => c.Listing).Include(c => c.Listing.Address).FirstOrDefault();            
             customer.Listing.AddressId = address.AddressId;
             _context.SaveChanges();
-            DeserializeGeo(customer);
+            Customer customerholder = new Customer();
+            customerholder = await DeserializeGeo(customer);
+            _context.SaveChanges();
             var listings = _context.Listings.ToList();
             return View("Index", listings);
         }
 
-        public async void DeserializeGeo(Customer customer)
+        public async Task<Customer> DeserializeGeo(Customer customer)
         {
             string url = $"https://maps.googleapis.com/maps/api/geocode/json?address={customer.Listing.Address.StreetAddress},{customer.Listing.Address.City},{customer.Listing.Address.State}&key={ApiKey.GOOGLE_API_KEY}";
-            HttpClient client = new HttpClient();
-            HttpResponseMessage response = await client.GetAsync(url);
-            string jsonResult = await response.Content.ReadAsStringAsync();
-            if (response.IsSuccessStatusCode)
+            using (HttpClient client = new HttpClient())
             {
-                var geocode = JsonConvert.DeserializeObject<JObject>(jsonResult);
-                var results = geocode["results"][0];
-                var location = results["geometry"]["location"];
-                customer.Listing.Address.Latitute = (double)location["lat"];
-                customer.Listing.Address.Longitude = (double)location["lng"];
-                _context.Update(customer);
+                HttpResponseMessage response = await client.GetAsync(url);
+                string jsonResult = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    var geocode = JsonConvert.DeserializeObject<JObject>(jsonResult);
+                    var results = geocode["results"][0];
+                    var location = results["geometry"]["location"];
+                    customer.Listing.Address.Latitute = (double)location["lat"];
+                    customer.Listing.Address.Longitude = (double)location["lng"];                    
+                }
+
+                return (customer);
             }
-           
         }
 
     }
