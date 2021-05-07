@@ -249,5 +249,41 @@ namespace Renter_Capstone.Controllers
             }
         }
 
+        public IActionResult FilterListings()
+        {
+            var cost = _context.Listings.Select(x => x.Cost).Distinct().ToList();
+            cost.Add(0);
+            ViewBag.Cost = new SelectList(cost);
+            var listings = _context.Listings;
+            return View(listings);
+        }
+
+        public IActionResult FilterListings(int cost)
+        {
+            var cost1 = _context.Listings.Select(x => x.Cost).Distinct().ToList();
+            cost1.Add(0);
+            ViewBag.Cost = new SelectList(cost1);
+            List<Listing> listings = null;
+
+            if(cost == 0)
+            {
+                listings = _context.Listings.ToList();
+                return View(listings);
+            }
+            else
+            {
+                listings = _context.Listings.Where(lis => lis.Cost <= cost).ToList();
+                if(listings != null)
+                {
+                    return View(listings);
+                }
+                else
+                {
+                    return View();
+                }
+            }
+            
+        }
+
     }
 }
