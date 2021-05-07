@@ -36,7 +36,8 @@ namespace Renter_Capstone.Controllers
             //    var interested = _context.InterestedParties.Where(inter => inter.Listing == customer.Listing).ToList();
             //    return View("LeasIndex", interested);
             //}
-            return View();
+            var listings = _context.Listings.ToList();
+            return View(listings);
         }
 
         // GET: Customers/Details/5
@@ -47,7 +48,7 @@ namespace Renter_Capstone.Controllers
                 return NotFound();
             }
 
-            var listing =  _context.Listings.Where(m => m.ListingId == id);
+            Listing listing =  _context.Listings.Where(m => m.ListingId == id).Include(m => m.Address).FirstOrDefault();
             if (listing == null)
             {
                 return NotFound();
@@ -147,23 +148,20 @@ namespace Renter_Capstone.Controllers
         }
 
         // GET: Customers/Delete/5
-        public async Task<IActionResult> Delete(int? id)
+        public IActionResult Delete(int? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var customer = await _context.Customers
-                .Include(c => c.IdentityUser)
-                .Include(c => c.Listing)
-                .FirstOrDefaultAsync(m => m.CustomerId == id);
-            if (customer == null)
+            Listing listing = _context.Listings.Where(c => c.ListingId == id).Include(c => c.Address).FirstOrDefault();
+            if (listing == null)
             {
                 return NotFound();
             }
 
-            return View(customer);
+            return View(listing);
         }
 
         // POST: Customers/Delete/5
@@ -195,11 +193,12 @@ namespace Renter_Capstone.Controllers
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customer = _context.Customers.Where(cust => cust.IdentityUserId == userId).FirstOrDefault();
-            customer.ListingId = listing.ListingId;
             listing.Prioirty = 0;
             _context.Add(listing);
             _context.SaveChanges();
-            if(listing.AddressId == 0 || listing.AddressId == null)
+            customer.ListingId = listing.ListingId;
+            _context.SaveChanges();
+            if (listing.AddressId == 0 || listing.AddressId == null)
             {
                 return View("AddAddress");
             }
@@ -217,12 +216,13 @@ namespace Renter_Capstone.Controllers
         [ValidateAntiForgeryToken]
         public IActionResult AddAddress([Bind("AddressId,StreetAddress,City,State,Latitute,Longitude")] Address address)
         {
-            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var customer = _context.Customers.Where(cust => cust.IdentityUserId == userId).FirstOrDefault();
-            customer.Listing.AddressId = address.AddressId;
-            DeserializeGeo(customer);
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);                      
             _context.Add(address);
-            _context.SaveChangesAsync();
+            _context.SaveChanges();
+            var customer = _context.Customers.Where(cust => cust.IdentityUserId == userId).Include(c => c.Listing).Include(c => c.Listing.Address).FirstOrDefault();            
+            customer.Listing.AddressId = address.AddressId;
+            _context.SaveChanges();
+            DeserializeGeo(customer);
             var listings = _context.Listings.ToList();
             return View("Index", listings);
         }
@@ -240,8 +240,7 @@ namespace Renter_Capstone.Controllers
                 var location = results["geometry"]["location"];
                 customer.Listing.Address.Latitute = (double)location["lat"];
                 customer.Listing.Address.Longitude = (double)location["lng"];
-                var lat = location["lat"];
-                var lng = location["lng"];               
+                _context.Update(customer);
             }
            
         }
