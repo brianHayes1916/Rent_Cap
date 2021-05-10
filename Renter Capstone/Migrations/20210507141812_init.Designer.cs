@@ -10,8 +10,8 @@ using Renter_Capstone.Data;
 namespace Renter_Capstone.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210504151451_init2")]
-    partial class init2
+    [Migration("20210507141812_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -50,15 +50,15 @@ namespace Renter_Capstone.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "06927ff5-4782-4f4d-b301-209f774521d4",
-                            ConcurrencyStamp = "93f23bd7-006f-4ab3-94da-f9fdb405d436",
+                            Id = "20d7614e-5fe0-42d4-a810-733ecce9b491",
+                            ConcurrencyStamp = "8f8ec174-3ead-413e-b9d7-71adce687aea",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "87948262-bcb8-4af7-9973-150e5bbe44d1",
-                            ConcurrencyStamp = "5fe7667b-5134-4e3d-b9dc-8c410eafd8c1",
+                            Id = "e3fd87cd-95a0-4d4b-975f-6c2f8c96eb3f",
+                            ConcurrencyStamp = "bccef4b8-1a9f-4424-a520-7f7ca109a362",
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         });
@@ -240,6 +240,18 @@ namespace Renter_Capstone.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
+                    b.Property<string>("City")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("Latitute")
+                        .HasColumnType("float");
+
+                    b.Property<double>("Longitude")
+                        .HasColumnType("float");
+
+                    b.Property<string>("State")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("StreetAddress")
                         .HasColumnType("nvarchar(max)");
 
@@ -264,7 +276,7 @@ namespace Renter_Capstone.Migrations
                     b.Property<bool>("Leasing")
                         .HasColumnType("bit");
 
-                    b.Property<int>("ListingId")
+                    b.Property<int?>("ListingId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
@@ -272,6 +284,9 @@ namespace Renter_Capstone.Migrations
 
                     b.Property<bool>("Renter")
                         .HasColumnType("bit");
+
+                    b.Property<int>("Year")
+                        .HasColumnType("int");
 
                     b.HasKey("CustomerId");
 
@@ -311,7 +326,7 @@ namespace Renter_Capstone.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<int>("AddressId")
+                    b.Property<int?>("AddressId")
                         .HasColumnType("int");
 
                     b.Property<int>("Cost")
@@ -320,13 +335,16 @@ namespace Renter_Capstone.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("Images")
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<int>("NumberOfRoomMates")
+                        .HasColumnType("int");
 
                     b.Property<int>("Prioirty")
                         .HasColumnType("int");
 
                     b.Property<int>("SquareFeet")
+                        .HasColumnType("int");
+
+                    b.Property<int>("YearPref")
                         .HasColumnType("int");
 
                     b.HasKey("ListingId");
@@ -395,9 +413,7 @@ namespace Renter_Capstone.Migrations
 
                     b.HasOne("Renter_Capstone.Models.Listing", "Listing")
                         .WithMany()
-                        .HasForeignKey("ListingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("ListingId");
                 });
 
             modelBuilder.Entity("Renter_Capstone.Models.InterestedParty", b =>
@@ -419,9 +435,7 @@ namespace Renter_Capstone.Migrations
                 {
                     b.HasOne("Renter_Capstone.Models.Address", "Address")
                         .WithMany()
-                        .HasForeignKey("AddressId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("AddressId");
                 });
 #pragma warning restore 612, 618
         }

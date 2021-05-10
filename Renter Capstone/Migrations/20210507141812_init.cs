@@ -13,7 +13,11 @@ namespace Renter_Capstone.Migrations
                 {
                     AddressId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    StreetAddress = table.Column<string>(nullable: true)
+                    StreetAddress = table.Column<string>(nullable: true),
+                    City = table.Column<string>(nullable: true),
+                    State = table.Column<string>(nullable: true),
+                    Latitute = table.Column<double>(nullable: false),
+                    Longitude = table.Column<double>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -66,11 +70,12 @@ namespace Renter_Capstone.Migrations
                     ListingId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Prioirty = table.Column<int>(nullable: false),
-                    Images = table.Column<string>(nullable: true),
                     Cost = table.Column<int>(nullable: false),
                     Description = table.Column<string>(nullable: true),
                     SquareFeet = table.Column<int>(nullable: false),
-                    AddressId = table.Column<int>(nullable: false)
+                    NumberOfRoomMates = table.Column<int>(nullable: false),
+                    YearPref = table.Column<int>(nullable: false),
+                    AddressId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -80,7 +85,7 @@ namespace Renter_Capstone.Migrations
                         column: x => x.AddressId,
                         principalTable: "Addresses",
                         principalColumn: "AddressId",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -199,8 +204,9 @@ namespace Renter_Capstone.Migrations
                     Bio = table.Column<string>(nullable: true),
                     Renter = table.Column<bool>(nullable: false),
                     Leasing = table.Column<bool>(nullable: false),
+                    Year = table.Column<int>(nullable: false),
                     IdentityUserId = table.Column<string>(nullable: true),
-                    ListingId = table.Column<int>(nullable: false)
+                    ListingId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
@@ -216,18 +222,44 @@ namespace Renter_Capstone.Migrations
                         column: x => x.ListingId,
                         principalTable: "Listings",
                         principalColumn: "ListingId",
+                        onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "InterestedParties",
+                columns: table => new
+                {
+                    InterestedId = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ListingId = table.Column<int>(nullable: false),
+                    CustomerId = table.Column<int>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_InterestedParties", x => x.InterestedId);
+                    table.ForeignKey(
+                        name: "FK_InterestedParties_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
+                        principalColumn: "CustomerId",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_InterestedParties_Listings_ListingId",
+                        column: x => x.ListingId,
+                        principalTable: "Listings",
+                        principalColumn: "ListingId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "93508945-24f8-419b-aed0-bd04b982a68e", "478aff0d-cc7e-4baa-a0bf-4c43559308b5", "Admin", "ADMIN" });
+                values: new object[] { "20d7614e-5fe0-42d4-a810-733ecce9b491", "8f8ec174-3ead-413e-b9d7-71adce687aea", "Admin", "ADMIN" });
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "308efde5-e97d-4f23-b1ae-9fa674f4e760", "089d0202-ed44-49b4-aaa5-e0d9db900d89", "Customer", "CUSTOMER" });
+                values: new object[] { "e3fd87cd-95a0-4d4b-975f-6c2f8c96eb3f", "bccef4b8-1a9f-4424-a520-7f7ca109a362", "Customer", "CUSTOMER" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -279,6 +311,16 @@ namespace Renter_Capstone.Migrations
                 column: "ListingId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_InterestedParties_CustomerId",
+                table: "InterestedParties",
+                column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_InterestedParties_ListingId",
+                table: "InterestedParties",
+                column: "ListingId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Listings_AddressId",
                 table: "Listings",
                 column: "AddressId");
@@ -302,10 +344,13 @@ namespace Renter_Capstone.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Customers");
+                name: "InterestedParties");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
+
+            migrationBuilder.DropTable(
+                name: "Customers");
 
             migrationBuilder.DropTable(
                 name: "AspNetUsers");

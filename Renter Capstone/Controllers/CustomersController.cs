@@ -250,6 +250,16 @@ namespace Renter_Capstone.Controllers
             }
         }
 
+
+        //public List<SelectListItem> GetCost()
+        //{
+        //    List<SelectListItem> items = new List<SelectListItem>();
+        //    var bitems = _context.Listings.Select(x => x.Cost).ToList();
+        //    foreach(int cost in bitems)
+        //    {
+        //        items.Add(cost);
+        //    }
+        //}
         public IActionResult FilterListings()
         {
             List<int> cost = _context.Listings.Select(x => x.Cost).Distinct().ToList();
@@ -259,8 +269,8 @@ namespace Renter_Capstone.Controllers
             return View(listings);
         }
 
-        [HttpPost, ActionName("Index")]
-        [ValidateAntiForgeryToken]
+        //[HttpPost, ActionName("Index")]
+        //[ValidateAntiForgeryToken]
         public IActionResult FilterListings(int cost)
         {
             var cost1 = _context.Listings.Select(x => x.Cost).Distinct().ToList();

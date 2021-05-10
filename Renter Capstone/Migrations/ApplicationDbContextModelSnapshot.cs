@@ -48,15 +48,15 @@ namespace Renter_Capstone.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "217d6b46-3d5a-4dc9-bbbb-bd2a56572b0e",
-                            ConcurrencyStamp = "d0838054-2789-484b-b215-6e1f9da43773",
+                            Id = "20d7614e-5fe0-42d4-a810-733ecce9b491",
+                            ConcurrencyStamp = "8f8ec174-3ead-413e-b9d7-71adce687aea",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "8f9ad637-e65f-4656-95ce-fe1e606025fe",
-                            ConcurrencyStamp = "12f8399a-ae9c-491d-8150-07d6e90e61cb",
+                            Id = "e3fd87cd-95a0-4d4b-975f-6c2f8c96eb3f",
+                            ConcurrencyStamp = "bccef4b8-1a9f-4424-a520-7f7ca109a362",
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         });
