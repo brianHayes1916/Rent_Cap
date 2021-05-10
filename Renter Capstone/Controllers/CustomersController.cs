@@ -314,5 +314,27 @@ namespace Renter_Capstone.Controllers
             var listings = _context.Listings.Where(lis => lis.YearPref == customer.Year);
             return View("Index");
         }
+
+        public async void FindPropRentApi()
+        {
+            var client = new HttpClient();
+            var request = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri("https://realty-mole-property-api.p.rapidapi.com/salePrice?compaddress=2425%20Shoal%20Creek%20Lane%2C%20Rockwall%2C%20TX"),
+                Headers =
+                {
+                    { "x-rapidapi-key", $"{ApiKey.Rent_API_KEY}" },
+                    { "x-rapidapi-host", "realty-mole-property-api.p.rapidapi.com" },
+                },
+            };
+            using (var response = await client.SendAsync(request))
+            {
+                response.EnsureSuccessStatusCode();
+                var body = await response.Content.ReadAsStringAsync();
+                Console.WriteLine(body);
+            }
+        }
+
     }
 }
