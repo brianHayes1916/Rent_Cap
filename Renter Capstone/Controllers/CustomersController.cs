@@ -32,11 +32,11 @@ namespace Renter_Capstone.Controllers
             {
                 return View("Create");
             }
-            else if (customer.Leasing == true)
-            {
-                var interested = _context.InterestedParties.Where(inter => inter.Listing == customer.Listing).ToList();
-                return View("LeasIndex", interested);
-            }
+            //else if (customer.Leasing == true)
+            //{
+            //    var interested = _context.InterestedParties.Where(inter => inter.Listing == customer.Listing).ToList();
+            //    return View("LeasIndex", interested);
+            //}
             var listings = _context.Listings;//.Where(lis => lis.YearPref == customer.Year);
             return View(listings);
         }
