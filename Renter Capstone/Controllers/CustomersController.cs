@@ -37,7 +37,7 @@ namespace Renter_Capstone.Controllers
                 var interested = _context.InterestedParties.Where(inter => inter.Listing == customer.Listing).ToList();
                 return View("LeasIndex", interested);
             }
-            var listings = _context.Listings.Where(lis => lis.YearPref == customer.Year);
+            var listings = _context.Listings;//.Where(lis => lis.YearPref == customer.Year);
             return View(listings);
         }
 
@@ -89,7 +89,7 @@ namespace Renter_Capstone.Controllers
             }
             ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
             //ViewData["ListingId"] = new SelectList(_context.Listings, "ListingId", "ListingId", customer.ListingId);
-            var listings = _context.Listings.Where(lis => lis.YearPref == customer.Year);
+            var listings = _context.Listings;//.Where(lis => lis.YearPref == customer.Year);
             return View("Index", listings);
         }
 
@@ -226,7 +226,7 @@ namespace Renter_Capstone.Controllers
             Customer customerholder = new Customer();
             customerholder = await DeserializeGeo(customer);
             _context.SaveChanges();
-            var listings = _context.Listings.Where(lis => lis.YearPref == customer.Year);
+            var listings = _context.Listings;//.Where(lis => lis.YearPref == customer.Year);
             return View("Index", listings);
         }
 
@@ -311,17 +311,17 @@ namespace Renter_Capstone.Controllers
             interested.Listing = listed;
             _context.Add(interested);
             _context.SaveChanges();
-            var listings = _context.Listings.Where(lis => lis.YearPref == customer.Year);
+            //var listings = _context.Listings.Where(lis => lis.YearPref == customer.Year);
             return View("Index");
         }
 
-        public async void FindPropRentApi()
+        public async Task<RealEstateListing> FindPropRentApi(Address address)
         {
             var client = new HttpClient();
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri("https://realty-mole-property-api.p.rapidapi.com/salePrice?compaddress=2425%20Shoal%20Creek%20Lane%2C%20Rockwall%2C%20TX"),
+                RequestUri = new Uri($"https://realty-mole-property-api.p.rapidapi.com/salePrice?compaddress={address.StreetAddress},{address.City},{address.State}"),
                 Headers =
                 {
                     { "x-rapidapi-key", $"{ApiKey.Rent_API_KEY}" },
@@ -331,9 +331,26 @@ namespace Renter_Capstone.Controllers
             using (var response = await client.SendAsync(request))
             {
                 response.EnsureSuccessStatusCode();
-                var body = await response.Content.ReadAsStringAsync();
-                Console.WriteLine(body);
+                string body = await response.Content.ReadAsStringAsync();
+                RealEstateListing estateListing = null;
+                if (response.IsSuccessStatusCode)
+                {
+                    estateListing = JsonConvert.DeserializeObject<RealEstateListing>(body);                    
+                }
+                return (estateListing);
             }
+        }
+
+        public async Task<List<RealEstateListing>> GetEstateListings()
+        {
+            List<Address> addressCollection = _context.Addresses.ToList();
+            List<RealEstateListing> estateListings = new List<RealEstateListing>();
+            foreach(Address address in addressCollection)
+            {
+                RealEstateListing listing = await FindPropRentApi(address);
+                estateListings.Add(listing);
+            }
+            return (estateListings);
         }
 
     }
