@@ -7,7 +7,7 @@ namespace Renter_Capstone.Models
 {
     public class IndexViewModel
     {
-        public List<Listing> listings;
-        public List<RealEstateListing> estateListings;
+        public List<Listing> listings { get; set; }
+        public List<RealEstateListing> estateListings { get; set; }
     }
 }

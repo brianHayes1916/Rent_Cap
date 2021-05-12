@@ -24,7 +24,7 @@ namespace Renter_Capstone.Controllers
         }
 
         // GET: Customers
-        public IActionResult Index()
+        public async Task<IActionResult> IndexAsync()
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customer = _context.Customers.Where(x => x.IdentityUserId == userId).FirstOrDefault();
@@ -37,8 +37,11 @@ namespace Renter_Capstone.Controllers
             //    var interested = _context.InterestedParties.Where(inter => inter.Listing == customer.Listing).ToList();
             //    return View("LeasIndex", interested);
             //}
-            var listings = _context.Listings;//.Where(lis => lis.YearPref == customer.Year);
-            return View(listings);
+            List<Listing> listings = _context.Listings.ToList();//.Where(lis => lis.YearPref == customer.Year);
+            IndexViewModel viewModel = new IndexViewModel();
+            viewModel.listings = listings;
+            viewModel.estateListings = await GetEstateListings();
+            return View(viewModel);
         }
 
         // GET: Customers/Details/5
@@ -85,7 +88,7 @@ namespace Renter_Capstone.Controllers
             {
                 _context.Add(customer);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(IndexAsync));
             }
             ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
             //ViewData["ListingId"] = new SelectList(_context.Listings, "ListingId", "ListingId", customer.ListingId);
@@ -116,7 +119,7 @@ namespace Renter_Capstone.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ListingId,Prioirty,Cost,Description,SquareFeet,NumberOfRoomMates,YearPref,AddressId")] Listing listing)
+        public async Task<IActionResult> Edit(int id, [Bind("ListingId,Prioirty,Description,NumberOfRoomMates,YearPref,AddressId")] Listing listing)
         {
             if (id != listing.ListingId)
             {
@@ -141,7 +144,7 @@ namespace Renter_Capstone.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(IndexAsync));
             }
             //ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
             //ViewData["ListingId"] = new SelectList(_context.Listings, "ListingId", "ListingId", customer.ListingId);
@@ -173,7 +176,7 @@ namespace Renter_Capstone.Controllers
             var listing = await _context.Listings.FindAsync(id);
             _context.Listings.Remove(listing);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(IndexAsync));
         }
 
         private bool CustomerExists(int id)
@@ -190,7 +193,7 @@ namespace Renter_Capstone.Controllers
 
         [HttpPost, ActionName("AddListing")]
         [ValidateAntiForgeryToken]
-        public IActionResult AddListing([Bind("ListingId,Prioirty,Cost,Description,SquareFeet,NumberOfRoomMates,YearPref,AddressId")] Listing listing)
+        public IActionResult AddListing([Bind("ListingId,Prioirty,Description,NumberOfRoomMates,YearPref,AddressId")] Listing listing)
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customer = _context.Customers.Where(cust => cust.IdentityUserId == userId).FirstOrDefault();
@@ -260,43 +263,43 @@ namespace Renter_Capstone.Controllers
         //        items.Add(cost);
         //    }
         //}
-        public IActionResult FilterListings()
-        {
-            List<int> cost = _context.Listings.Select(x => x.Cost).Distinct().ToList();
-            cost.Add(0);
-            ViewBag.Cost = new SelectList(cost);
-            var listings = _context.Listings;
-            return View(listings);
-        }
+        //public IActionResult FilterListings()
+        //{
+        //    List<int> cost = _context.Listings.Select(x => x.Cost).Distinct().ToList();
+        //    cost.Add(0);
+        //    ViewBag.Cost = new SelectList(cost);
+        //    var listings = _context.Listings;
+        //    return View(listings);
+        //}
 
-        //[HttpPost, ActionName("Index")]
-        //[ValidateAntiForgeryToken]
-        public IActionResult FilterListings(int cost)
-        {
-            var cost1 = _context.Listings.Select(x => x.Cost).Distinct().ToList();
-            cost1.Add(0);
-            ViewBag.Cost = new SelectList(cost1);
-            List<Listing> listings = null;
+        ////[HttpPost, ActionName("Index")]
+        ////[ValidateAntiForgeryToken]
+        //public IActionResult FilterListings(int cost)
+        //{
+        //    var cost1 = _context.Listings.Select(x => x.Cost).Distinct().ToList();
+        //    cost1.Add(0);
+        //    ViewBag.Cost = new SelectList(cost1);
+        //    List<Listing> listings = null;
 
-            if(cost == 0)
-            {
-                listings = _context.Listings.ToList();
-                return View(listings);
-            }
-            else
-            {
-                listings = _context.Listings.Where(lis => lis.Cost <= cost).ToList();
-                if(listings != null)
-                {
-                    return View(listings);
-                }
-                else
-                {
-                    return View();
-                }
-            }
+        //    if(cost == 0)
+        //    {
+        //        listings = _context.Listings.ToList();
+        //        return View(listings);
+        //    }
+        //    else
+        //    {
+        //        listings = _context.Listings.Where(lis => lis.Cost <= cost).ToList();
+        //        if(listings != null)
+        //        {
+        //            return View(listings);
+        //        }
+        //        else
+        //        {
+        //            return View();
+        //        }
+        //    }
             
-        }
+        //}
 
 
         public IActionResult Interested(int id)

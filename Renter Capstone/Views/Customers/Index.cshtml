@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Renter_Capstone.Models.Listing>
+﻿@model Renter_Capstone.Models.IndexViewModel
 
 @{
     ViewData["Title"] = "Index";
@@ -10,70 +10,81 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
-<p>
-    @using (Html.BeginForm())
-    {
-        <select name="cost" asp-items="@ViewBag.Cost"></select>
-        <input type="submit" value="Search" />
-    }
-</p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Prioirty)
+                @Html.DisplayNameFor(model => model.listings.)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Cost)
+                @Html.DisplayNameFor(model => model.listing.Description)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Description)
+                @Html.DisplayNameFor(model => model.listing.NumberOfRoomMates)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.SquareFeet)
+                @Html.DisplayNameFor(model => model.listing.YearPref)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.NumberOfRoomMates)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.YearPref)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Address)
+                @Html.DisplayNameFor(model => model.listing.Address)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Prioirty)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Cost)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Description)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SquareFeet)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.NumberOfRoomMates)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.YearPref)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Address.AddressId)
-            </td>
-            <td>
-                <a asp-action="Index" asp-route-id="@item.ListingId">Show Interest</a> |
-                <a asp-action="Details" asp-route-id="@item.ListingId">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ListingId">Delete</a>
-            </td>
-        </tr>
-}
+        @foreach (var item in Model.listings)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.NumberOfRoomMates)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.YearPref)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Address.AddressId)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.ListingId">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.ListingId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.ListingId">Delete</a>
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
+
+<h2>Map</h2>
+<style>
+    #map {
+        height: 300px;
+        width: 500px;
+    }
+</style>
+<div class="row">
+    <div id="map"></div>
+    <script>
+        var map;
+        var marker;
+        function initMap() {
+            map = new google.maps.Map(document.getElementById('map'), {
+                center: { lat: @Model.Address.Latitute, lng: @Model.Address.Longitude },
+                zoom: 8
+            });
+            for (i = 0; i < @Model.listings.Count; i++) {
+                marker = new google.maps.Marker({
+                    position: { lat: @Model.Address.Latitute, lng: @Model.Address.Longitude},
+                    map: map
+                });
+            }
+        }
+    </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=@ApiKey.GOOGLE_API_KEY&callback=initMap"
+            async defer></script>
+</div>
