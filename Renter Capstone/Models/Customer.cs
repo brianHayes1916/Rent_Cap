@@ -22,8 +22,8 @@ namespace Renter_Capstone.Models
         public string IdentityUserId { get; set; }
         public IdentityUser IdentityUser { get; set; }
 
-        [ForeignKey("Listing")]
+        [ForeignKey("CustomerListing")]
         public int? ListingId { get; set; }
-        public Listing Listing { get; set; }
+        public CustomerListing Listing { get; set; }
     }
 }

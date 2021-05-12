@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -21,6 +22,7 @@ namespace Renter_Capstone.Models
         public class Listing
         {
             public string id { get; set; }
+            [JsonProperty(PropertyName = "formattedAddress")]
             public string formattedAddress { get; set; }
             public float longitude { get; set; }
             public float latitude { get; set; }

@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Renter_Capstone.Models
 {
-    public class Listing
+    public class CustomerListing
     {
         [Key]
         public int ListingId { get; set; }

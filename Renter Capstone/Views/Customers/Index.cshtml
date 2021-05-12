@@ -1,4 +1,4 @@
-﻿@model Renter_Capstone.Models.IndexViewModel
+﻿@model IEnumerable<Renter_Capstone.Models.IndexViewModel>
 
 @{
     ViewData["Title"] = "Index";
@@ -14,32 +14,32 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.listings.)
+                @Html.DisplayNameFor(model => model.Listing.Prioirty)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.listing.Description)
+                @Html.DisplayNameFor(model => model.Listing.Description)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.listing.NumberOfRoomMates)
+                @Html.DisplayNameFor(model => model.Listing.NumberOfRoomMates)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.listing.YearPref)
+                @Html.DisplayNameFor(model => model.Listing.YearPref)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.listing.Address)
+                @Html.DisplayNameFor(model => model.Listing.Address)
             </th>
             <th></th>
         </tr>
     </thead>
     <tbody>
-        @foreach (var item in Model.listings)
+        @foreach (var item in Model)
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.)
+                    @Html.DisplayFor(modelItem => item.Listing)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Description)
+                    @Html.DisplayFor(modelItem => item.RealEstateListingRootObject.)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.NumberOfRoomMates)

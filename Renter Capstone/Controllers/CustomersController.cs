@@ -37,11 +37,20 @@ namespace Renter_Capstone.Controllers
             //    var interested = _context.InterestedParties.Where(inter => inter.Listing == customer.Listing).ToList();
             //    return View("LeasIndex", interested);
             //}
-            List<Listing> listings = _context.Listings.ToList();//.Where(lis => lis.YearPref == customer.Year);
-            IndexViewModel viewModel = new IndexViewModel();
-            viewModel.listings = listings;
-            viewModel.estateListings = await GetEstateListings();
-            return View(viewModel);
+            List<CustomerListing> listings = _context.CustomerListings.ToList();//.Where(lis => lis.YearPref == customer.Year);
+            List<IndexViewModel> viewModels = new List<IndexViewModel>();
+            foreach (var listing in listings)
+            {
+                IndexViewModel viewModel = new IndexViewModel()
+                {
+                    Listing = listing,
+                    RealEstateListingRootObject = new RealEstateListing.Rootobject(),
+                    RealEstateListing = await GetEstateListings()
+                };
+                viewModels.Add(viewModel);
+               
+            }
+            return View(viewModels);
         }
 
         // GET: Customers/Details/5
@@ -52,7 +61,7 @@ namespace Renter_Capstone.Controllers
                 return NotFound();
             }
 
-            Listing listing =  _context.Listings.Where(m => m.ListingId == id).Include(m => m.Address).FirstOrDefault();
+            CustomerListing listing =  _context.CustomerListings.Where(m => m.ListingId == id).Include(m => m.Address).FirstOrDefault();
             if (listing == null)
             {
                 return NotFound();
@@ -92,7 +101,7 @@ namespace Renter_Capstone.Controllers
             }
             ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
             //ViewData["ListingId"] = new SelectList(_context.Listings, "ListingId", "ListingId", customer.ListingId);
-            var listings = _context.Listings;//.Where(lis => lis.YearPref == customer.Year);
+            var listings = _context.CustomerListings;//.Where(lis => lis.YearPref == customer.Year);
             return View("Index", listings);
         }
 
@@ -104,7 +113,7 @@ namespace Renter_Capstone.Controllers
                 return NotFound();
             }
 
-            var listing = await _context.Listings.FindAsync(id);
+            var listing = await _context.CustomerListings.FindAsync(id);
             if (listing == null)
             {
                 return NotFound();
@@ -119,7 +128,7 @@ namespace Renter_Capstone.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ListingId,Prioirty,Description,NumberOfRoomMates,YearPref,AddressId")] Listing listing)
+        public async Task<IActionResult> Edit(int id, [Bind("ListingId,Prioirty,Description,NumberOfRoomMates,YearPref,AddressId")] CustomerListing listing)
         {
             if (id != listing.ListingId)
             {
@@ -159,7 +168,7 @@ namespace Renter_Capstone.Controllers
                 return NotFound();
             }
 
-            Listing listing = _context.Listings.Where(c => c.ListingId == id).Include(c => c.Address).FirstOrDefault();
+            CustomerListing listing = _context.CustomerListings.Where(c => c.ListingId == id).Include(c => c.Address).FirstOrDefault();
             if (listing == null)
             {
                 return NotFound();
@@ -173,8 +182,8 @@ namespace Renter_Capstone.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var listing = await _context.Listings.FindAsync(id);
-            _context.Listings.Remove(listing);
+            var listing = await _context.CustomerListings.FindAsync(id);
+            _context.CustomerListings.Remove(listing);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(IndexAsync));
         }
@@ -193,7 +202,7 @@ namespace Renter_Capstone.Controllers
 
         [HttpPost, ActionName("AddListing")]
         [ValidateAntiForgeryToken]
-        public IActionResult AddListing([Bind("ListingId,Prioirty,Description,NumberOfRoomMates,YearPref,AddressId")] Listing listing)
+        public IActionResult AddListing([Bind("ListingId,Prioirty,Description,NumberOfRoomMates,YearPref,AddressId")] CustomerListing listing)
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customer = _context.Customers.Where(cust => cust.IdentityUserId == userId).FirstOrDefault();
@@ -229,7 +238,7 @@ namespace Renter_Capstone.Controllers
             Customer customerholder = new Customer();
             customerholder = await DeserializeGeo(customer);
             _context.SaveChanges();
-            var listings = _context.Listings;//.Where(lis => lis.YearPref == customer.Year);
+            var listings = _context.CustomerListings;//.Where(lis => lis.YearPref == customer.Year);
             return View("Index", listings);
         }
 
@@ -310,7 +319,7 @@ namespace Renter_Capstone.Controllers
             interested.Customer = customer;
             interested.CustomerId = customer.CustomerId;
             interested.ListingId = id;
-            Listing listed = _context.Listings.Where(lis => lis.ListingId == id).FirstOrDefault();
+            CustomerListing listed = _context.CustomerListings.Where(lis => lis.ListingId == id).FirstOrDefault();
             interested.Listing = listed;
             _context.Add(interested);
             _context.SaveChanges();
@@ -344,7 +353,7 @@ namespace Renter_Capstone.Controllers
             }
         }
 
-        public async Task<List<RealEstateListing>> GetEstateListings()
+        public async Task<RealEstateListing> GetEstateListings()
         {
             List<Address> addressCollection = _context.Addresses.ToList();
             List<RealEstateListing> estateListings = new List<RealEstateListing>();
@@ -353,7 +362,9 @@ namespace Renter_Capstone.Controllers
                 RealEstateListing listing = await FindPropRentApi(address);
                 estateListings.Add(listing);
             }
-            return (estateListings);
+
+            RealEstateListing listing = await FindPropRentApi(address);
+            return (listing);
         }
 
     }

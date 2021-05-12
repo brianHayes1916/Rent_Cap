@@ -12,9 +12,9 @@ namespace Renter_Capstone.Models
         [Key]
         public int InterestedId { get; set; }
 
-        [ForeignKey("Listing")]
+        [ForeignKey("CustomerListing")]
         public int ListingId { get; set; }
-        public Listing Listing { get; set; }
+        public CustomerListing Listing { get; set; }
 
         [ForeignKey("Customer")]
         public int CustomerId { get; set; }

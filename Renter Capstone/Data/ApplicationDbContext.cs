@@ -18,7 +18,7 @@ namespace Renter_Capstone.Data
 
         public DbSet<Customer> Customers { get; set; }
         public DbSet<Address> Addresses { get; set; }
-        public DbSet<Listing> Listings { get; set; }
+        public DbSet<CustomerListing> CustomerListings { get; set; }
         public DbSet<InterestedParty> InterestedParties { get; set; }
 
         protected override void OnModelCreating(ModelBuilder builder)
