@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Renter_Capstone.Migrations
 {
-    public partial class modelChanges3 : Migration
+    public partial class postNukeInit : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -252,12 +252,12 @@ namespace Renter_Capstone.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "2b8657ee-217e-479b-bfae-ebf41748f569", "92323ec2-1d61-4d90-8c6c-aafb0e017b2d", "Admin", "ADMIN" });
+                values: new object[] { "1d89602a-c3c7-4f54-b1d8-f2a529824df1", "2caf85ab-837f-43cc-806e-3d30e3a41fd3", "Admin", "ADMIN" });
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "f75f74e7-5bab-45f2-b87c-3a3e3729cc30", "24f6b127-3cdc-42c8-9474-84669e788698", "Customer", "CUSTOMER" });
+                values: new object[] { "e09341be-30b3-4904-8777-99ae1ae56911", "e41e5c96-7576-4ead-9d6d-f5093866979d", "Customer", "CUSTOMER" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",

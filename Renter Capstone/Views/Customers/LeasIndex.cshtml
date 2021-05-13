@@ -20,20 +20,11 @@
                 @Html.DisplayNameFor(model => model.Bio)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Renter)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Leasing)
-            </th>
+                @Html.DisplayNameFor(model => model.PhoneNumber)
+            </th>            
             <th>
                 @Html.DisplayNameFor(model => model.Year)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.IdentityUser)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Listing)
-            </th>
+            </th>            
             <th></th>
         </tr>
     </thead>
@@ -47,20 +38,11 @@
                 @Html.DisplayFor(modelItem => item.Bio)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Renter)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Leasing)
-            </td>
+                @Html.DisplayFor(modelItem => item.PhoneNumber)
+            </td>            
             <td>
                 @Html.DisplayFor(modelItem => item.Year)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.IdentityUser.Id)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Listing.ListingId)
-            </td>
+            </td>            
             <td>
                 <a asp-action="Edit" asp-route-id="@item.CustomerId">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.CustomerId">Details</a> |

@@ -14,6 +14,7 @@ namespace Renter_Capstone.Models
         public int CustomerId { get; set; }
         public string Name { get; set; }
         public string Bio { get; set; }
+        public string PhoneNumber { get; set; }
         public bool Renter { get; set; }
         public bool Leasing { get; set; }
         public int Year { get; set; }

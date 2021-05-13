@@ -87,7 +87,7 @@ namespace Renter_Capstone.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("UserId,Name,Bio,Renter,Leasing,Year,IdentityUserId,ListingId")] Customer customer)
+        public async Task<IActionResult> Create([Bind("UserId,Name,Bio,PhoneNumber,Renter,Leasing,Year,IdentityUserId,ListingId")] Customer customer)
         {
             
             customer.IdentityUserId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -359,6 +359,12 @@ namespace Renter_Capstone.Controllers
                 }
             }
             return View(viewModels);
+        }
+
+        public IActionResult ShowInterestedParties()
+        {
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var customer = _context.Customers.Where(cust => cust.IdentityUserId == userId).FirstOrDefault();
         }
 
         [HttpPost, ActionName("Interested")]

@@ -10,8 +10,8 @@ using Renter_Capstone.Data;
 namespace Renter_Capstone.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210512171301_modelChanges3")]
-    partial class modelChanges3
+    [Migration("20210513181355_postNukeInit")]
+    partial class postNukeInit
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -50,15 +50,15 @@ namespace Renter_Capstone.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "2b8657ee-217e-479b-bfae-ebf41748f569",
-                            ConcurrencyStamp = "92323ec2-1d61-4d90-8c6c-aafb0e017b2d",
+                            Id = "1d89602a-c3c7-4f54-b1d8-f2a529824df1",
+                            ConcurrencyStamp = "2caf85ab-837f-43cc-806e-3d30e3a41fd3",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "f75f74e7-5bab-45f2-b87c-3a3e3729cc30",
-                            ConcurrencyStamp = "24f6b127-3cdc-42c8-9474-84669e788698",
+                            Id = "e09341be-30b3-4904-8777-99ae1ae56911",
+                            ConcurrencyStamp = "e41e5c96-7576-4ead-9d6d-f5093866979d",
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         });
