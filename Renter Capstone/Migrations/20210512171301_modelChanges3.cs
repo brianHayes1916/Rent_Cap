@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Renter_Capstone.Migrations
 {
-    public partial class init : Migration
+    public partial class modelChanges3 : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -64,24 +64,22 @@ namespace Renter_Capstone.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Listings",
+                name: "CustomerListings",
                 columns: table => new
                 {
                     ListingId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Prioirty = table.Column<int>(nullable: false),
-                    Cost = table.Column<int>(nullable: false),
                     Description = table.Column<string>(nullable: true),
-                    SquareFeet = table.Column<int>(nullable: false),
                     NumberOfRoomMates = table.Column<int>(nullable: false),
                     YearPref = table.Column<int>(nullable: false),
                     AddressId = table.Column<int>(nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Listings", x => x.ListingId);
+                    table.PrimaryKey("PK_CustomerListings", x => x.ListingId);
                     table.ForeignKey(
-                        name: "FK_Listings_Addresses_AddressId",
+                        name: "FK_CustomerListings_Addresses_AddressId",
                         column: x => x.AddressId,
                         principalTable: "Addresses",
                         principalColumn: "AddressId",
@@ -218,9 +216,9 @@ namespace Renter_Capstone.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
-                        name: "FK_Customers_Listings_ListingId",
+                        name: "FK_Customers_CustomerListings_ListingId",
                         column: x => x.ListingId,
-                        principalTable: "Listings",
+                        principalTable: "CustomerListings",
                         principalColumn: "ListingId",
                         onDelete: ReferentialAction.Restrict);
                 });
@@ -244,9 +242,9 @@ namespace Renter_Capstone.Migrations
                         principalColumn: "CustomerId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_InterestedParties_Listings_ListingId",
+                        name: "FK_InterestedParties_CustomerListings_ListingId",
                         column: x => x.ListingId,
-                        principalTable: "Listings",
+                        principalTable: "CustomerListings",
                         principalColumn: "ListingId",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -254,12 +252,12 @@ namespace Renter_Capstone.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "20d7614e-5fe0-42d4-a810-733ecce9b491", "8f8ec174-3ead-413e-b9d7-71adce687aea", "Admin", "ADMIN" });
+                values: new object[] { "2b8657ee-217e-479b-bfae-ebf41748f569", "92323ec2-1d61-4d90-8c6c-aafb0e017b2d", "Admin", "ADMIN" });
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "e3fd87cd-95a0-4d4b-975f-6c2f8c96eb3f", "bccef4b8-1a9f-4424-a520-7f7ca109a362", "Customer", "CUSTOMER" });
+                values: new object[] { "f75f74e7-5bab-45f2-b87c-3a3e3729cc30", "24f6b127-3cdc-42c8-9474-84669e788698", "Customer", "CUSTOMER" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -301,6 +299,11 @@ namespace Renter_Capstone.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
+                name: "IX_CustomerListings_AddressId",
+                table: "CustomerListings",
+                column: "AddressId");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Customers_IdentityUserId",
                 table: "Customers",
                 column: "IdentityUserId");
@@ -319,11 +322,6 @@ namespace Renter_Capstone.Migrations
                 name: "IX_InterestedParties_ListingId",
                 table: "InterestedParties",
                 column: "ListingId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Listings_AddressId",
-                table: "Listings",
-                column: "AddressId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -356,7 +354,7 @@ namespace Renter_Capstone.Migrations
                 name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "Listings");
+                name: "CustomerListings");
 
             migrationBuilder.DropTable(
                 name: "Addresses");

@@ -1,4 +1,4 @@
-﻿@model Renter_Capstone.Models.CustomerListing
+﻿@model Renter_Capstone.Models.IndexViewModel
 
 @{
     ViewData["Title"] = "Details";
@@ -12,39 +12,51 @@
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Prioirty)
+            @Html.DisplayNameFor(model => model.RealEstateListingListing.price)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Prioirty)
+            @Html.DisplayFor(model => model.RealEstateListingListing.price)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Description)
+            @Html.DisplayNameFor(model => model.RealEstateListingListing.bathrooms)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Description)
+            @Html.DisplayFor(model => model.RealEstateListingListing.bathrooms)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.NumberOfRoomMates)
+            @Html.DisplayNameFor(model => model.RealEstateListingListing.bedrooms)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.NumberOfRoomMates)
+            @Html.DisplayFor(model => model.RealEstateListingListing.bedrooms)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.YearPref)
+            @Html.DisplayNameFor(model => model.RealEstateListingListing.price)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.YearPref)
+            @Html.DisplayFor(model => model.RealEstateListingListing.price)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Address)
+            @Html.DisplayNameFor(model => model.Listing.Address.StreetAddress)
         </dt>
         <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Address.AddressId)
+            @Html.DisplayFor(model => model.Listing.Address.StreetAddress)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Listing.Description)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Listing.Description)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.Listing.NumberOfRoomMates)
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.Listing.NumberOfRoomMates)
         </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model.ListingId">Edit</a> |
+    <a asp-action="Interested" asp-route-id="@Model.Listing.ListingId">Show Interest</a> |
     <a asp-action="Index">Back to List</a>
 </div>
 <h2>Map</h2>
@@ -61,12 +73,12 @@
         var marker;
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
-                center: { lat: @Model.Address.Latitute, lng: @Model.Address.Longitude },
+                center: { lat: @Model.Listing.Address.Latitute, lng: @Model.Listing.Address.Longitude },
                 zoom: 8
             });
 
             marker = new google.maps.Marker({
-                position: { lat: @Model.Address.Latitute, lng: @Model.Address.Longitude},
+                position: { lat: @Model.Listing.Address.Latitute, lng: @Model.Listing.Address.Longitude},
                 map: map
             });
         }

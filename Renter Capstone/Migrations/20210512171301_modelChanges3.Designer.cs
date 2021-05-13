@@ -10,8 +10,8 @@ using Renter_Capstone.Data;
 namespace Renter_Capstone.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20210507141812_init")]
-    partial class init
+    [Migration("20210512171301_modelChanges3")]
+    partial class modelChanges3
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -50,15 +50,15 @@ namespace Renter_Capstone.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "20d7614e-5fe0-42d4-a810-733ecce9b491",
-                            ConcurrencyStamp = "8f8ec174-3ead-413e-b9d7-71adce687aea",
+                            Id = "2b8657ee-217e-479b-bfae-ebf41748f569",
+                            ConcurrencyStamp = "92323ec2-1d61-4d90-8c6c-aafb0e017b2d",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "e3fd87cd-95a0-4d4b-975f-6c2f8c96eb3f",
-                            ConcurrencyStamp = "bccef4b8-1a9f-4424-a520-7f7ca109a362",
+                            Id = "f75f74e7-5bab-45f2-b87c-3a3e3729cc30",
+                            ConcurrencyStamp = "24f6b127-3cdc-42c8-9474-84669e788698",
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         });
@@ -297,6 +297,35 @@ namespace Renter_Capstone.Migrations
                     b.ToTable("Customers");
                 });
 
+            modelBuilder.Entity("Renter_Capstone.Models.CustomerListing", b =>
+                {
+                    b.Property<int>("ListingId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<int?>("AddressId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("NumberOfRoomMates")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Prioirty")
+                        .HasColumnType("int");
+
+                    b.Property<int>("YearPref")
+                        .HasColumnType("int");
+
+                    b.HasKey("ListingId");
+
+                    b.HasIndex("AddressId");
+
+                    b.ToTable("CustomerListings");
+                });
+
             modelBuilder.Entity("Renter_Capstone.Models.InterestedParty", b =>
                 {
                     b.Property<int>("InterestedId")
@@ -317,41 +346,6 @@ namespace Renter_Capstone.Migrations
                     b.HasIndex("ListingId");
 
                     b.ToTable("InterestedParties");
-                });
-
-            modelBuilder.Entity("Renter_Capstone.Models.Listing", b =>
-                {
-                    b.Property<int>("ListingId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<int?>("AddressId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Cost")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("NumberOfRoomMates")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Prioirty")
-                        .HasColumnType("int");
-
-                    b.Property<int>("SquareFeet")
-                        .HasColumnType("int");
-
-                    b.Property<int>("YearPref")
-                        .HasColumnType("int");
-
-                    b.HasKey("ListingId");
-
-                    b.HasIndex("AddressId");
-
-                    b.ToTable("Listings");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -411,9 +405,16 @@ namespace Renter_Capstone.Migrations
                         .WithMany()
                         .HasForeignKey("IdentityUserId");
 
-                    b.HasOne("Renter_Capstone.Models.Listing", "Listing")
+                    b.HasOne("Renter_Capstone.Models.CustomerListing", "Listing")
                         .WithMany()
                         .HasForeignKey("ListingId");
+                });
+
+            modelBuilder.Entity("Renter_Capstone.Models.CustomerListing", b =>
+                {
+                    b.HasOne("Renter_Capstone.Models.Address", "Address")
+                        .WithMany()
+                        .HasForeignKey("AddressId");
                 });
 
             modelBuilder.Entity("Renter_Capstone.Models.InterestedParty", b =>
@@ -424,18 +425,11 @@ namespace Renter_Capstone.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Renter_Capstone.Models.Listing", "Listing")
+                    b.HasOne("Renter_Capstone.Models.CustomerListing", "Listing")
                         .WithMany()
                         .HasForeignKey("ListingId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("Renter_Capstone.Models.Listing", b =>
-                {
-                    b.HasOne("Renter_Capstone.Models.Address", "Address")
-                        .WithMany()
-                        .HasForeignKey("AddressId");
                 });
 #pragma warning restore 612, 618
         }

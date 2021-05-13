@@ -10,20 +10,30 @@
 <p>
     <a asp-action="Create">Create New</a>
 </p>
+<p>
+    @using (Html.BeginForm())
+    {
+        <select name="price" asp-items="@ViewBag.Price"></select>
+        <select name="bed" asp-items="@ViewBag.Bed"></select>
+        <select name="bath" asp-items="@ViewBag.Bath"></select>
+        <select name="roomMates" asp-items="@ViewBag.RoomMates"></select>
+        <input type="submit" value="Search" />
+    }
+</p>
 <table class="table">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Listing.Prioirty)
+                @Html.DisplayNameFor(model => model.RealEstateListingListing.bathrooms)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Listing.Description)
+                @Html.DisplayNameFor(model => model.RealEstateListingListing.bedrooms)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Listing.NumberOfRoomMates)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Listing.YearPref)
+                @Html.DisplayNameFor(model => model.RealEstateListingListing.price)
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.Listing.Address)
@@ -36,24 +46,24 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Listing)
+                    @Html.DisplayFor(modelItem => item.RealEstateListingListing.bathrooms)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.RealEstateListingRootObject.)
+                    @Html.DisplayFor(modelItem => item.RealEstateListingListing.bedrooms)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.NumberOfRoomMates)
+                    @Html.DisplayFor(modelItem => item.Listing.NumberOfRoomMates)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.YearPref)
+                    @Html.DisplayFor(modelItem => item.RealEstateListingListing.price)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Address.AddressId)
+                    @Html.DisplayFor(modelItem => item.Listing.Address)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.ListingId">Edit</a> |
-                    <a asp-action="Details" asp-route-id="@item.ListingId">Details</a> |
-                    <a asp-action="Delete" asp-route-id="@item.ListingId">Delete</a>
+                    <a asp-action="Interested" asp-route-id="@item.Listing.ListingId">Show Interest</a> |
+                    <a asp-action="Details" asp-route-id="@item.Listing.ListingId">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Listing.ListingId">Delete</a>
                 </td>
             </tr>
         }
@@ -74,15 +84,17 @@
         var marker;
         function initMap() {
             map = new google.maps.Map(document.getElementById('map'), {
-                center: { lat: @Model.Address.Latitute, lng: @Model.Address.Longitude },
+                center: { lat: 32.7767, lng: 96.7970 },
                 zoom: 8
             });
-            for (i = 0; i < @Model.listings.Count; i++) {
-                marker = new google.maps.Marker({
-                    position: { lat: @Model.Address.Latitute, lng: @Model.Address.Longitude},
-                    map: map
+            @foreach(var item in Model)
+            {
+                <text>marker = new google.maps.Marker({
+                position: { lat: @item.Listing.Address.Latitute, lng: @item.Listing.Address.Longitude},
+                map: map
                 });
-            }
+                </text>
+            }            
         }
     </script>
     <script src="https://maps.googleapis.com/maps/api/js?key=@ApiKey.GOOGLE_API_KEY&callback=initMap"

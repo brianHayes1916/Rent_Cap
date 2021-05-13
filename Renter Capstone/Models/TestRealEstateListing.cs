@@ -1,17 +1,15 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Renter_Capstone.Models
 {
-    public class RealEstateListing
+    public class TestRealEstateListing
     {
-
         public class Rootobject
         {
-            public double price { get; set; }
+            public int price { get; set; }
             public float priceRangeLow { get; set; }
             public float priceRangeHigh { get; set; }
             public float longitude { get; set; }
@@ -22,7 +20,6 @@ namespace Renter_Capstone.Models
         public class Listing
         {
             public string id { get; set; }
-            [JsonProperty(PropertyName = "formattedAddress")]
             public string formattedAddress { get; set; }
             public float longitude { get; set; }
             public float latitude { get; set; }

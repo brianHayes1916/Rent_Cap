@@ -30,6 +30,7 @@ namespace Renter_Capstone.Controllers
             var customer = _context.Customers.Where(x => x.IdentityUserId == userId).FirstOrDefault();
             if (customer == null)
             {
+                //var testListing = await GetEstateListings();
                 return View("Create");
             }
             //else if (customer.Leasing == true)
@@ -45,7 +46,7 @@ namespace Renter_Capstone.Controllers
                 {
                     Listing = listing,
                     RealEstateListingRootObject = new RealEstateListing.Rootobject(),
-                    RealEstateListing = await GetEstateListings()
+                    RealEstateListingListing = new RealEstateListing.Listing(),                    
                 };
                 viewModels.Add(viewModel);
                
@@ -54,7 +55,7 @@ namespace Renter_Capstone.Controllers
         }
 
         // GET: Customers/Details/5
-        public IActionResult Details(int? id)
+        public async Task<IActionResult> DetailsAsync(int? id)
         {
             if (id == null)
             {
@@ -66,8 +67,11 @@ namespace Renter_Capstone.Controllers
             {
                 return NotFound();
             }
+            IndexViewModel viewModel = new IndexViewModel();
+            viewModel.Listing = listing;
+            viewModel.RealEstateListingListing = await GetEstateListings(listing.Address);
 
-            return View(listing);
+            return View(viewModel);
         }
 
         // GET: Customers/Create
@@ -234,12 +238,13 @@ namespace Renter_Capstone.Controllers
             _context.SaveChanges();
             var customer = _context.Customers.Where(cust => cust.IdentityUserId == userId).Include(c => c.Listing).Include(c => c.Listing.Address).FirstOrDefault();            
             customer.Listing.AddressId = address.AddressId;
+            customer.Listing.Address = address;
             _context.SaveChanges();
             Customer customerholder = new Customer();
             customerholder = await DeserializeGeo(customer);
             _context.SaveChanges();
-            var listings = _context.CustomerListings;//.Where(lis => lis.YearPref == customer.Year);
-            return View("Index", listings);
+            List <IndexViewModel> viewModels = await GetAllViewModels();
+            return View("Index", viewModels);
         }
 
         public async Task<Customer> DeserializeGeo(Customer customer)
@@ -272,45 +277,92 @@ namespace Renter_Capstone.Controllers
         //        items.Add(cost);
         //    }
         //}
-        //public IActionResult FilterListings()
-        //{
-        //    List<int> cost = _context.Listings.Select(x => x.Cost).Distinct().ToList();
-        //    cost.Add(0);
-        //    ViewBag.Cost = new SelectList(cost);
-        //    var listings = _context.Listings;
-        //    return View(listings);
-        //}
+        public async Task<IActionResult> FilterListings()
+        {
+            List<int> price = new List<int>();            
+            List<int> bed = new List<int>();
+            List<float> bath = new List<float>();
+            List<int> roomMates = new List<int>();
+            List<CustomerListing> listings = _context.CustomerListings.ToList();//.Where(lis => lis.YearPref == customer.Year);
+            List<IndexViewModel> viewModels = new List<IndexViewModel>();
+            foreach (var listing in listings)
+            {
+                IndexViewModel viewModel = new IndexViewModel()
+                {
+                    Listing = listing,
+                    RealEstateListingRootObject = new RealEstateListing.Rootobject(),
+                    RealEstateListingListing = await GetEstateListings(listing.Address)
+                    
+                };
+                price.Add(viewModel.RealEstateListingListing.price);
+                bed.Add(viewModel.RealEstateListingListing.bedrooms);
+                bath.Add(viewModel.RealEstateListingListing.bathrooms);
+                roomMates.Add(viewModel.Listing.NumberOfRoomMates);
+                viewModels.Add(viewModel);
 
-        ////[HttpPost, ActionName("Index")]
-        ////[ValidateAntiForgeryToken]
-        //public IActionResult FilterListings(int cost)
-        //{
-        //    var cost1 = _context.Listings.Select(x => x.Cost).Distinct().ToList();
-        //    cost1.Add(0);
-        //    ViewBag.Cost = new SelectList(cost1);
-        //    List<Listing> listings = null;
+            }
+            price.Add(0);
+            bed.Add(0);
+            bath.Add(0);
+            roomMates.Add(0);
+            ViewBag.Price = new SelectList(price);
+            ViewBag.Bed = new SelectList(bed);
+            ViewBag.Bath = new SelectList(bath);
+            ViewBag.RoomMates = new SelectList(roomMates);
+            return View(viewModels);
+        }
 
-        //    if(cost == 0)
-        //    {
-        //        listings = _context.Listings.ToList();
-        //        return View(listings);
-        //    }
-        //    else
-        //    {
-        //        listings = _context.Listings.Where(lis => lis.Cost <= cost).ToList();
-        //        if(listings != null)
-        //        {
-        //            return View(listings);
-        //        }
-        //        else
-        //        {
-        //            return View();
-        //        }
-        //    }
-            
-        //}
+        //[HttpPost, ActionName("Index")]
+        //[ValidateAntiForgeryToken]
+        public async Task<IActionResult> filterlistings(int price, int bed, float bath, int roomMates)
+        {
 
+            List<IndexViewModel> viewModels = await GetAllViewModels();
+            if(price != 0)
+            {
+                foreach(IndexViewModel viewModel in viewModels)
+                {
+                    if(viewModel.RealEstateListingListing.price > price)
+                    {
+                        viewModels.Remove(viewModel);
+                    }
+                }
+            }
+            if (bed != 0)
+            {
+                foreach (IndexViewModel viewModel in viewModels)
+                {
+                    if (viewModel.RealEstateListingListing.bedrooms > bed)
+                    {
+                        viewModels.Remove(viewModel);
+                    }
+                }
+            }
+            if (bath != 0)
+            {
+                foreach (IndexViewModel viewModel in viewModels)
+                {
+                    if (viewModel.RealEstateListingListing.bathrooms > bath)
+                    {
+                        viewModels.Remove(viewModel);
+                    }
+                }
+            }
+            if (roomMates != 0)
+            {
+                foreach (IndexViewModel viewModel in viewModels)
+                {
+                    if (viewModel.Listing.NumberOfRoomMates > roomMates)
+                    {
+                        viewModels.Remove(viewModel);
+                    }
+                }
+            }
+            return View(viewModels);
+        }
 
+        [HttpPost, ActionName("Interested")]
+        [ValidateAntiForgeryToken]
         public IActionResult Interested(int id)
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -327,13 +379,13 @@ namespace Renter_Capstone.Controllers
             return View("Index");
         }
 
-        public async Task<RealEstateListing> FindPropRentApi(Address address)
+        public async Task<RealEstateListing.Listing> FindPropRentApi(Address address)
         {
             var client = new HttpClient();
             var request = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri($"https://realty-mole-property-api.p.rapidapi.com/salePrice?compaddress={address.StreetAddress},{address.City},{address.State}"),
+                RequestUri = new Uri($"https://realty-mole-property-api.p.rapidapi.com/salePrice?address={address.StreetAddress},{address.City},{address.State}"),
                 Headers =
                 {
                     { "x-rapidapi-key", $"{ApiKey.Rent_API_KEY}" },
@@ -342,29 +394,69 @@ namespace Renter_Capstone.Controllers
             };
             using (var response = await client.SendAsync(request))
             {
-                response.EnsureSuccessStatusCode();
+                //response.EnsureSuccessStatusCode();
                 string body = await response.Content.ReadAsStringAsync();
-                RealEstateListing estateListing = null;
+                RealEstateListing.Listing desiredListing = new RealEstateListing.Listing();
                 if (response.IsSuccessStatusCode)
                 {
-                    estateListing = JsonConvert.DeserializeObject<RealEstateListing>(body);                    
+                    var estateListing = JsonConvert.DeserializeObject<JObject>(body);
+                    var listingResult = estateListing["listings"][0];
+
+                    //one option
+                    //RealEstateListing.Listing listing = JsonConvert.DeserializeObject<RealEstateListing.Listing>(listingResult);
+
+                    //RealEstateListing.Listing desiredListing = new RealEstateListing.Listing();
+                    desiredListing.address = (string)listingResult["address"];
+                    desiredListing.id = (string)listingResult["id"];
+                    desiredListing.formattedAddress = (string)listingResult["formattedAddress"];
+                    desiredListing.longitude = (float)listingResult["longitude"];
+                    desiredListing.latitude = (float)listingResult["latitude"];
+                    desiredListing.city = (string)listingResult["city"];
+                    desiredListing.state = (string)listingResult["state"];
+                    desiredListing.zipcode = (string)listingResult["zipcode"];
+                    desiredListing.publishedDate = (DateTime)listingResult["publishedDate"];
+                    desiredListing.distance = (float)listingResult["distance"];
+                    desiredListing.daysOld = (float)listingResult["daysOld"];
+                    desiredListing.correlation = (float)listingResult["correlation"];
+                    desiredListing.county = (string)listingResult["county"];
+                    desiredListing.bedrooms = (int)listingResult["bedrooms"];
+                    desiredListing.bathrooms = (float)listingResult["bathrooms"];
+                    desiredListing.propertyType = (string)listingResult["propertyType"];
+                    desiredListing.squareFootage = (int)listingResult["squareFootage"];                    
+                    desiredListing.price = (int)listingResult["price"];                    
                 }
-                return (estateListing);
+               return (desiredListing);
             }
         }
 
-        public async Task<RealEstateListing> GetEstateListings()
+        public async Task<RealEstateListing.Listing> GetEstateListings(Address address)
         {
-            List<Address> addressCollection = _context.Addresses.ToList();
-            List<RealEstateListing> estateListings = new List<RealEstateListing>();
-            foreach(Address address in addressCollection)
-            {
-                RealEstateListing listing = await FindPropRentApi(address);
-                estateListings.Add(listing);
-            }
+            //Address address = new Address();
+            //address.City = "Rockwall";
+            //address.State = "TX";
+            //address.StreetAddress = "1390 Whitney Lakes Drive";
+            RealEstateListing.Listing listings = await FindPropRentApi(address);
+            //RealEstateListing.Listing listing = listings[0];
+            return (listings);
+        }
 
-            RealEstateListing listing = await FindPropRentApi(address);
-            return (listing);
+        public async Task<List<IndexViewModel>> GetAllViewModels()
+        {
+            List<CustomerListing> listings = _context.CustomerListings.ToList();//.Where(lis => lis.YearPref == customer.Year);
+            List<IndexViewModel> viewModels = new List<IndexViewModel>();
+            foreach (var listing in listings)
+            {
+                IndexViewModel viewModel = new IndexViewModel()
+                {
+                    Listing = listing,
+                    RealEstateListingRootObject = new RealEstateListing.Rootobject(),
+                    RealEstateListingListing = await GetEstateListings(listing.Address)  
+                    //pass in listing.address when you fix GetEstateListings
+                };
+                viewModels.Add(viewModel);
+
+            }
+            return (viewModels);
         }
 
     }
