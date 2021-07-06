@@ -38,20 +38,21 @@ namespace Renter_Capstone.Controllers
             //    var interested = _context.InterestedParties.Where(inter => inter.Listing == customer.Listing).ToList();
             //    return View("LeasIndex", interested);
             //}
-            List<CustomerListing> listings = _context.CustomerListings.ToList();//.Where(lis => lis.YearPref == customer.Year);
+            //List<CustomerListing> listings = _context.CustomerListings.ToList();//.Where(lis => lis.YearPref == customer.Year);
             List<IndexViewModel> viewModels = new List<IndexViewModel>();
-            foreach (var listing in listings)
-            {
-                IndexViewModel viewModel = new IndexViewModel()
-                {
-                    Listing = listing,
-                    RealEstateListingRootObject = new RealEstateListing.Rootobject(),
-                    RealEstateListingListing = new RealEstateListing.Listing(),                    
-                };
-                viewModels.Add(viewModel);
+            //foreach (var listing in listings)
+            //{
+            //    IndexViewModel viewModel = new IndexViewModel()
+            //    {
+            //        Listing = listing,
+            //        RealEstateListingRootObject = new RealEstateListing.Rootobject(),
+            //        RealEstateListingListing = new RealEstateListing.Listing(),                    
+            //    };
+            //    viewModels.Add(viewModel);
                
-            }
-            return View(viewModels);
+            //}
+            viewModels = await GetAllViewModels();
+            return View("Index",viewModels);
         }
 
         // GET: Customers/Details/5
@@ -101,12 +102,14 @@ namespace Renter_Capstone.Controllers
             {
                 _context.Add(customer);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(IndexAsync));
+                //return RedirectToAction(nameof(IndexAsync));
             }
             ViewData["IdentityUserId"] = new SelectList(_context.Users, "Id", "Id", customer.IdentityUserId);
             //ViewData["ListingId"] = new SelectList(_context.Listings, "ListingId", "ListingId", customer.ListingId);
-            var listings = _context.CustomerListings;//.Where(lis => lis.YearPref == customer.Year);
-            return View("Index", listings);
+            //var listings = _context.CustomerListings;//.Where(lis => lis.YearPref == customer.Year);
+            List<IndexViewModel> viewModels = new List<IndexViewModel>();
+            viewModels = await GetAllViewModels();
+            return View("Index", viewModels);
         }
 
         // GET: Customers/Edit/5
@@ -132,7 +135,7 @@ namespace Renter_Capstone.Controllers
         // more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("ListingId,Prioirty,Description,NumberOfRoomMates,YearPref,AddressId")] CustomerListing listing)
+        public async Task<IActionResult> Edit(int id, [Bind("ListingId,Prioirty,Cost,Description,NumberOfRoomMates,YearPref,AddressId")] CustomerListing listing)
         {
             if (id != listing.ListingId)
             {
@@ -206,11 +209,12 @@ namespace Renter_Capstone.Controllers
 
         [HttpPost, ActionName("AddListing")]
         [ValidateAntiForgeryToken]
-        public IActionResult AddListing([Bind("ListingId,Prioirty,Description,NumberOfRoomMates,YearPref,AddressId")] CustomerListing listing)
+        public IActionResult AddListing([Bind("ListingId,Prioirty,Cost,Description,NumberOfRoomMates,YearPref,AddressId")] CustomerListing listing)
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customer = _context.Customers.Where(cust => cust.IdentityUserId == userId).FirstOrDefault();
             listing.Prioirty = 0;
+            listing.Cost = 0;
             _context.Add(listing);
             _context.SaveChanges();
             customer.ListingId = listing.ListingId;
@@ -243,7 +247,7 @@ namespace Renter_Capstone.Controllers
             Customer customerholder = new Customer();
             customerholder = await DeserializeGeo(customer);
             _context.SaveChanges();
-            List <IndexViewModel> viewModels = await GetAllViewModels();
+            List<IndexViewModel> viewModels = await GetAllViewModels();
             return View("Index", viewModels);
         }
 
@@ -312,59 +316,70 @@ namespace Renter_Capstone.Controllers
             return View(viewModels);
         }
 
-        //[HttpPost, ActionName("Index")]
-        //[ValidateAntiForgeryToken]
+        [HttpPost, ActionName("Filter")]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> filterlistings(int price, int bed, float bath, int roomMates)
-        {
-
-            List<IndexViewModel> viewModels = await GetAllViewModels();
-            if(price != 0)
-            {
-                foreach(IndexViewModel viewModel in viewModels)
-                {
-                    if(viewModel.RealEstateListingListing.price > price)
-                    {
-                        viewModels.Remove(viewModel);
-                    }
-                }
-            }
-            if (bed != 0)
-            {
-                foreach (IndexViewModel viewModel in viewModels)
-                {
-                    if (viewModel.RealEstateListingListing.bedrooms > bed)
-                    {
-                        viewModels.Remove(viewModel);
-                    }
-                }
-            }
-            if (bath != 0)
-            {
-                foreach (IndexViewModel viewModel in viewModels)
-                {
-                    if (viewModel.RealEstateListingListing.bathrooms > bath)
-                    {
-                        viewModels.Remove(viewModel);
-                    }
-                }
-            }
-            if (roomMates != 0)
-            {
-                foreach (IndexViewModel viewModel in viewModels)
-                {
-                    if (viewModel.Listing.NumberOfRoomMates > roomMates)
-                    {
-                        viewModels.Remove(viewModel);
-                    }
-                }
-            }
-            return View(viewModels);
-        }
-
-        public IActionResult ShowInterestedParties()
         {
             var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
             var customer = _context.Customers.Where(cust => cust.IdentityUserId == userId).FirstOrDefault();
+            List<CustomerListing> listings = new List<CustomerListing>();
+            List<IndexViewModel> viewModels = new List<IndexViewModel>();
+            if (price == 400000 && roomMates == 2)
+            {
+                listings = _context.CustomerListings.Where(lis => lis.Cost < 400000 && lis.NumberOfRoomMates < 3 && lis.YearPref == customer.Year).Include(lis => lis.Address).ToList();
+            }
+            else if(price == 400000)
+            {
+                listings = _context.CustomerListings.Where(lis => lis.Cost < 400000 && lis.YearPref == customer.Year).Include(lis => lis.Address).ToList();
+            }
+            else if (roomMates == 2)
+            {
+                listings = _context.CustomerListings.Where(lis => lis.NumberOfRoomMates < 3 && lis.YearPref == customer.Year).Include(lis => lis.Address).ToList();
+            }
+            else
+            {
+                listings = _context.CustomerListings.Where(lis => lis.YearPref == customer.Year).Include(lis => lis.Address).ToList();
+            }
+
+            foreach (var listing in listings)
+            {
+                IndexViewModel viewModel = new IndexViewModel()
+                {
+                    Listing = listing,
+                    RealEstateListingRootObject = new RealEstateListing.Rootobject(),
+                    RealEstateListingListing = await GetEstateListings(listing.Address)
+                    //pass in listing.address when you fix GetEstateListings
+                };
+                viewModels.Add(viewModel);
+                //listing.Cost = viewModel.RealEstateListingListing.price;
+                //_context.SaveChanges();
+                //viewModelHolder.Baths.Add(viewModel.RealEstateListingListing.bathrooms);
+                //viewModelHolder.Beds.Add(viewModel.RealEstateListingListing.bedrooms);
+                //viewModelHolder.Prices.Add(viewModel.RealEstateListingListing.price);
+                //viewModelHolder.RoomMates.Add(viewModel.Listing.NumberOfRoomMates);
+
+                //List<SelectListItem> bathOptions = viewModelHolder.Baths.Select(a => new SelectListItem { Value = a.ToString(), Text = a.ToString() }).ToList();
+
+
+            }
+
+            return View("Index",viewModels);
+
+        }
+
+        [HttpPost, ActionName("ShowInterested")]
+        [ValidateAntiForgeryToken]
+        public IActionResult ShowInterestedParties()
+        {
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var customer = _context.Customers.Where(cust => cust.IdentityUserId == userId).Include(cust => cust.Listing).FirstOrDefault();
+            List<InterestedParty> parties = _context.InterestedParties.Where(inter => inter.Listing == customer.Listing).Include(inter => inter.Customer).ToList();
+            List<Customer> interestedPeople = new List<Customer>();
+            foreach(InterestedParty interestedParty in parties)
+            {
+                interestedPeople.Add(interestedParty.Customer);
+            }
+            return View("LeaseIndex",interestedPeople);
         }
 
         [HttpPost, ActionName("Interested")]
@@ -448,7 +463,9 @@ namespace Renter_Capstone.Controllers
 
         public async Task<List<IndexViewModel>> GetAllViewModels()
         {
-            List<CustomerListing> listings = _context.CustomerListings.ToList();//.Where(lis => lis.YearPref == customer.Year);
+            var userId = this.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var customer = _context.Customers.Where(cust => cust.IdentityUserId == userId).FirstOrDefault();
+            List<CustomerListing> listings = _context.CustomerListings.Where(c => c.YearPref == customer.Year).Include(c => c.Address).ToList();
             List<IndexViewModel> viewModels = new List<IndexViewModel>();
             foreach (var listing in listings)
             {
@@ -460,8 +477,18 @@ namespace Renter_Capstone.Controllers
                     //pass in listing.address when you fix GetEstateListings
                 };
                 viewModels.Add(viewModel);
+                listing.Cost = viewModel.RealEstateListingListing.price;
+                _context.SaveChanges();
+                //viewModelHolder.Baths.Add(viewModel.RealEstateListingListing.bathrooms);
+                //viewModelHolder.Beds.Add(viewModel.RealEstateListingListing.bedrooms);
+                //viewModelHolder.Prices.Add(viewModel.RealEstateListingListing.price);
+                //viewModelHolder.RoomMates.Add(viewModel.Listing.NumberOfRoomMates);
+
+                //List<SelectListItem> bathOptions = viewModelHolder.Baths.Select(a => new SelectListItem { Value = a.ToString(), Text = a.ToString() }).ToList();
+                
 
             }
+            
             return (viewModels);
         }
 

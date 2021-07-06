@@ -12,7 +12,7 @@ namespace Renter_Capstone.Models
         [Key]
         public int ListingId { get; set; }
         public int Prioirty { get; set; }
-        //public int Cost { get; set; }
+        public int? Cost { get; set; }
         public string Description { get; set; }
         //public int SquareFeet { get; set; }
         public int NumberOfRoomMates { get; set; }

@@ -48,15 +48,15 @@ namespace Renter_Capstone.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "1d89602a-c3c7-4f54-b1d8-f2a529824df1",
-                            ConcurrencyStamp = "2caf85ab-837f-43cc-806e-3d30e3a41fd3",
+                            Id = "a0789d50-5abb-4b58-8e8c-c775269ac46b",
+                            ConcurrencyStamp = "39d313c1-ae3b-467b-87f0-95df3762b17b",
                             Name = "Admin",
                             NormalizedName = "ADMIN"
                         },
                         new
                         {
-                            Id = "e09341be-30b3-4904-8777-99ae1ae56911",
-                            ConcurrencyStamp = "e41e5c96-7576-4ead-9d6d-f5093866979d",
+                            Id = "acddf077-4950-42cc-95d8-0bf1593b79bd",
+                            ConcurrencyStamp = "6006ff48-8e3a-4e56-bc19-0fcc2ba80ad1",
                             Name = "Customer",
                             NormalizedName = "CUSTOMER"
                         });
@@ -280,6 +280,9 @@ namespace Renter_Capstone.Migrations
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<bool>("Renter")
                         .HasColumnType("bit");
 
@@ -303,6 +306,9 @@ namespace Renter_Capstone.Migrations
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
                     b.Property<int?>("AddressId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("Cost")
                         .HasColumnType("int");
 
                     b.Property<string>("Description")

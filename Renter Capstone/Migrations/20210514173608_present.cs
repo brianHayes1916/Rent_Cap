@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace Renter_Capstone.Migrations
 {
-    public partial class postNukeInit : Migration
+    public partial class present : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -70,6 +70,7 @@ namespace Renter_Capstone.Migrations
                     ListingId = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Prioirty = table.Column<int>(nullable: false),
+                    Cost = table.Column<int>(nullable: true),
                     Description = table.Column<string>(nullable: true),
                     NumberOfRoomMates = table.Column<int>(nullable: false),
                     YearPref = table.Column<int>(nullable: false),
@@ -200,6 +201,7 @@ namespace Renter_Capstone.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(nullable: true),
                     Bio = table.Column<string>(nullable: true),
+                    PhoneNumber = table.Column<string>(nullable: true),
                     Renter = table.Column<bool>(nullable: false),
                     Leasing = table.Column<bool>(nullable: false),
                     Year = table.Column<int>(nullable: false),
@@ -252,12 +254,12 @@ namespace Renter_Capstone.Migrations
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "1d89602a-c3c7-4f54-b1d8-f2a529824df1", "2caf85ab-837f-43cc-806e-3d30e3a41fd3", "Admin", "ADMIN" });
+                values: new object[] { "a0789d50-5abb-4b58-8e8c-c775269ac46b", "39d313c1-ae3b-467b-87f0-95df3762b17b", "Admin", "ADMIN" });
 
             migrationBuilder.InsertData(
                 table: "AspNetRoles",
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
-                values: new object[] { "e09341be-30b3-4904-8777-99ae1ae56911", "e41e5c96-7576-4ead-9d6d-f5093866979d", "Customer", "CUSTOMER" });
+                values: new object[] { "acddf077-4950-42cc-95d8-0bf1593b79bd", "6006ff48-8e3a-4e56-bc19-0fcc2ba80ad1", "Customer", "CUSTOMER" });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",

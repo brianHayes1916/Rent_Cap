@@ -8,18 +8,23 @@
 <h1>Index</h1>
 
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-action="ShowInterested">view Interested</a>
 </p>
-<p>
-    @using (Html.BeginForm())
-    {
-        <select name="price" asp-items="@ViewBag.Price"></select>
-        <select name="bed" asp-items="@ViewBag.Bed"></select>
-        <select name="bath" asp-items="@ViewBag.Bath"></select>
-        <select name="roomMates" asp-items="@ViewBag.RoomMates"></select>
-        <input type="submit" value="Search" />
-    }
-</p>
+<form asp-action="Filter" method="post">
+    <div class="form-group">
+        <label>price</label>
+        <select name="Price">
+            <option value="">Select a max price</option>
+            <option value="400000">400000</option>
+        </select>
+        <label>roomMates</label>
+        <select name="roomMates">
+            <option value="">Select max Room Mates</option>
+            <option value="2">2</option>
+        </select>
+    </div>
+    <button type="submit" class="btn-secondary">Filter</button>
+</form>
 <table class="table">
     <thead>
         <tr>
